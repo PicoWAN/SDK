@@ -1640,16 +1640,9 @@ static void process_mac_command(uint8_t *mac_cmd_buffer, uint8_t mac_cmd_buffer_
 		// Decode Frame MAC commands
 		switch (mac_cmd_buffer[mac_index++]) {
 			case SRV_MAC_LINK_CHECK_ANS:
-				network_check_request = 0;
-				if (message_callbacks != NULL && message_callbacks->mac_network_state) {
-					mac_network_info.status = NETWORK_AVAILABLE;
-					last_demod_margin = mac_cmd_buffer[mac_index++];
-					last_nb_gateways = mac_cmd_buffer[mac_index++];
-					/* Send info to the application layer */
-					message_callbacks->mac_network_state(&mac_network_info);
-				} else {
-					osal_printf("MAC: no callback set for network\n");
-				}
+				mac_network_info.status = NETWORK_AVAILABLE;
+				last_demod_margin = mac_cmd_buffer[mac_index++];
+				last_nb_gateways = mac_cmd_buffer[mac_index++];
 				break;
 			case SRV_MAC_LINK_ADR_REQ:
 				// Initialize local copy of the channels mask array
@@ -2572,37 +2565,58 @@ static void internal_rxdone_cb(void)
 	}
 
 end_function:
-	if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
-		message_callbacks->mac_state(mac_state);
-	}
-	if (message_ack_request(&message_tx_rx) == WITH_ACK && network_check_request == 0) {
-		if ((mac_tx_info.status == MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
-			if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
-				mac_tx_info.nb_retries = ack_timeout_retries_counter;
-				/* Send the payload to the application layer */
-				message_callbacks->mac_tx_done(&mac_tx_info);
-			} else {
-				osal_printf("MAC: no callback set for tx\n");
+	if (network_check_request == 0) {
+		if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
+			message_callbacks->mac_state(mac_state);
+		}
+		if (message_ack_request(&message_tx_rx) == WITH_ACK) {
+			if ((mac_tx_info.status == MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
+				if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
+					mac_tx_info.nb_retries = ack_timeout_retries_counter;
+					/* Send the payload to the application layer */
+					message_callbacks->mac_tx_done(&mac_tx_info);
+				} else {
+					osal_printf("MAC: no callback set for tx\n");
+				}
 			}
 		}
-	}
-	if (msg.port != MAC_PORT_MAC_COMMAND && network_check_request == 0) {
-		if ((mac_rx_info.status >= MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
-			if (message_callbacks != NULL && message_callbacks->mac_rx_done) {
-				/* Send the payload to the application layer */
-				message_callbacks->mac_rx_done(&mac_rx_info);
-			} else {
-				osal_printf("MAC: no callback set for rx\n");
+		if (msg.port != MAC_PORT_MAC_COMMAND) {
+			if ((mac_rx_info.status >= MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
+				if (message_callbacks != NULL && message_callbacks->mac_rx_done) {
+					/* Send the payload to the application layer */
+					message_callbacks->mac_rx_done(&mac_rx_info);
+				} else {
+					osal_printf("MAC: no callback set for rx\n");
+				}
 			}
 		}
-	}
-	/* MAC command answer was not received */
-	if ((network_check_request == 1) && (rx_slot == 1)) {
-		network_check_request = 0;
-		if (message_callbacks != NULL && message_callbacks->mac_network_state) {
-			mac_network_info.status = NETWORK_UNAVAILABLE;
-			/* Send info to the application layer */
-			message_callbacks->mac_network_state(&mac_network_info);
+	} else {
+		if (osal_get_radio_buffer_length() > 0) {
+			network_check_request = 0;
+			/* We receive a message after checking network */
+			/* If the LinkCheckAns MAC Command is missing from the frame, NETWORK_UNKNOWN is returned */
+			if (message_callbacks != NULL && message_callbacks->mac_network_state) {
+				/* Send info to the application layer */
+				message_callbacks->mac_network_state(&mac_network_info);
+			} else {
+				osal_printf("MAC: no callback set for network\n");
+			}
+		} else {
+			/* No frame received */
+			if (rx_slot == 1) {
+				network_check_request = 0;
+				mac_network_info.status = NETWORK_UNAVAILABLE;
+				if (message_callbacks != NULL && message_callbacks->mac_network_state) {
+					/* Send info to the application layer */
+					message_callbacks->mac_network_state(&mac_network_info);
+				} else {
+					osal_printf("MAC: no callback set for network\n");
+				}
+			}
+		}
+		if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
+			mac_state = MAC_STATE_IDLE;
+			message_callbacks->mac_state(mac_state);
 		}
 	}
 }
@@ -2665,9 +2679,11 @@ static void internal_txdone_cb(void)
 		}
 	}
 
-	if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
-		mac_state = MAC_STATE_WAITING_DATA;
-		message_callbacks->mac_state(mac_state);
+	if (network_check_request == 0) {
+		if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
+			mac_state = MAC_STATE_WAITING_DATA;
+			message_callbacks->mac_state(mac_state);
+		}
 	}
 }
 
@@ -2776,16 +2792,16 @@ static loramac_status_t schedule_tx(void)
 				/* Send info to the application layer */
 				message_callbacks->mac_network_state(&mac_network_info);
 			}
-		}
+		} else {
+			mac_tx_info.status = MAC_INFO_STATUS_DUTY_CYCLE_LIMITATION;
+			mac_tx_info.nb_retries = ack_timeout_retries_counter;
+			mac_tx_info.ack_status = UNDEF_ACK;
+			osal_post_job(&tx_done_cb_job, tx_done_cb_event);
 
-		mac_tx_info.status = MAC_INFO_STATUS_DUTY_CYCLE_LIMITATION;
-		mac_tx_info.nb_retries = ack_timeout_retries_counter;
-		mac_tx_info.ack_status = UNDEF_ACK;
-		osal_post_job(&tx_done_cb_job, tx_done_cb_event);
-
-		if (mac_state != MAC_STATE_IDLE) {
-			mac_state = MAC_STATE_IDLE;
-			osal_post_job(&mac_state_cb_job, mac_state_cb_event);
+			if (mac_state != MAC_STATE_IDLE) {
+				mac_state = MAC_STATE_IDLE;
+				osal_post_job(&mac_state_cb_job, mac_state_cb_event);
+			}
 		}
 
 		return LORAMAC_STATUS_OK;
@@ -2821,9 +2837,16 @@ static void send_packet(uint32_t freq, enum osal_sf_t sf, enum osal_bw_t bw, uin
 	osal_set_radio_callback(internal_txdone_cb);
 
 	loramac_state = LORAMAC_STATE_SENDING_DATA;
-	if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
-		mac_state = MAC_STATE_SENDING_DATA;
-		message_callbacks->mac_state(mac_state);
+	if (network_check_request == 0) {
+		if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
+			mac_state = MAC_STATE_SENDING_DATA;
+			message_callbacks->mac_state(mac_state);
+		}
+	} else {
+		if (message_callbacks != NULL && message_callbacks->mac_state != NULL) {
+			mac_state = MAC_STATE_SEARCHING_NETWORK;
+			message_callbacks->mac_state(mac_state);
+		}
 	}
 	osal_radio(OSAL_RADIO_START_TX);
 }
@@ -2832,6 +2855,7 @@ static uint8_t _check_network_available(void)
 {
 	mac_status_t state;
 	network_check_request = 1;
+	mac_network_info.status = NETWORK_UNKNOWN;
 	osal_printf("Checking for network availability\n");
 
 	add_mac_command(MOTE_MAC_LINK_CHECK_REQ, 0, 0);
@@ -2840,8 +2864,11 @@ static uint8_t _check_network_available(void)
 		return 1;
 	} else {
 		network_check_request = 0;
+		/* Remove the LinkCheckReq MAC Command to not check the network in the next sending */
+		if (mac_commands_buffer_index > 0) {
+			mac_commands_buffer_index--;
+		}
 		if (message_callbacks != NULL && message_callbacks->mac_network_state) {
-			mac_network_info.status = NETWORK_UNKNOWN;
 			/* Send info to the application layer */
 			message_callbacks->mac_network_state(&mac_network_info);
 		}
