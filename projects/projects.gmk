@@ -1,0 +1,245 @@
+ROOT = ../../..
+
+# GNU ARM Embedded Toolchain location
+TOOLCHAIN = $(ROOT)/toolchain/gcc-arm-none-eabi-6-2017-q2-update
+
+# Board selection
+BOARD ?= discovery_stm32l1
+FWCFG += -DCFG_$(BOARD)_board
+
+# Default MACs to include
+ENABLE_PICOMAC ?= true
+ENABLE_LORAMAC ?= true
+
+# OpenOCD location
+OPENOCD_BIN          = $(ROOT)/utils/openocd/bin/openocd
+
+# PicoFlash location and default TTY to use
+PICOFLASH_FOLDER     = $(ROOT)/utils/PicoFlash
+PICOFLASH_BIN        = $(PICOFLASH_FOLDER)/PicoFlash
+PICOFLASH_TTY       ?= /dev/ttyUSB0
+
+ifeq ($(BOARD), discovery_stm32l1)
+	# STM32L152 MDP version
+	FWCFG  += -DSTM32L1XX_MDP
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0x400
+	HALTYPE = STM32L1
+	LD_FILE ?= stm32l15xx6.ld
+	FLASHTOOL = OPENOCD
+	OPENOCD_CFG_FILE = board/stm32ldiscovery.cfg
+endif
+
+ifeq ($(BOARD), picotag)
+	# STM32L151 MD version
+	FWCFG  += -DSTM32L1XX_MD
+	# Shift both sections to keep the data of the regular PicoTAG FW in case someone wants to go back
+	FWCFG  += -DSECTION_PRIVATE_START=0x80 -DSECTION_PRIVATE_LENGTH=0xB80 -DSECTION_COMMON_START=0xC80 -DSECTION_COMMON_LENGTH=0x380
+	HALTYPE = STM32L1
+	LD_FILE ?= stm32l15xx6-picotag.ld
+	VECT_TAB_OFFSET ?= 0x2800
+	FLASHTOOL = PICOFLASH
+endif
+
+ifeq ($(BOARD), murata_sychip)
+	# STM32L082 48-pin
+	FWCFG  += -DSTM32L082xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+endif
+
+ifeq ($(BOARD), murata_discovery)
+	# STM32L072 48-pin
+	FWCFG  += -DSTM32L072xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+	FLASHTOOL = OPENOCD
+	OPENOCD_CFG_FILE = board/stm32l0discovery.cfg
+endif
+
+ifeq ($(BOARD), murata_module)
+	# STM32L072 48-pin
+	FWCFG  += -DSTM32L072xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+endif
+
+ifeq ($(BOARD), nucleo)
+	# STM32L073 64-pin
+	FWCFG  += -DSTM32L073xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+	FLASHTOOL = OPENOCD
+	OPENOCD_CFG_FILE = board/stm32l0discovery.cfg
+endif
+
+ifeq ($(BOARD), picoshield)
+	# STM32L072 48-pin
+	FWCFG  += -DSTM32L072xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+endif
+
+MACDIR        = ../../common/mac
+PICOMACDIR    = $(MACDIR)/pico-mac
+LORAMACDIR    = $(MACDIR)/lora-mac
+OSDIR         = ../../common/os
+UTILSDIR      = ../../common/utils
+RADIODIR      = ../../common/radio
+SENSORSDIR    = ../../common/sensors
+HALDIR        = ../../common/stm32/$(HALTYPE)
+HALINCDIR     = ../../common/stm32/includes
+LIBDIR        = $(MACDIR)/lib/gcc/$(HALTYPE)
+BUILDDIR      = build/$(BOARD)
+
+PICOMACSRCDIR = ../../../pico-mac-src
+
+
+ifeq ($(HALTYPE), STM32L1)
+MCU       = cortex-m3
+STLIBROOT = $(ROOT)/libs/STM32L1xx_StdPeriph_Lib_V1.3.0
+
+INC       = -I$(STLIBROOT)/Libraries/CMSIS/Include
+else ifeq ($(HALTYPE), STM32L0)
+MCU       = cortex-m0plus
+STLIBROOT = $(ROOT)/libs/STM32Cube_FW_L0_V1.9.0
+
+INC       = -I$(STLIBROOT)/Drivers/CMSIS/Include
+INC      += -I$(STLIBROOT)/Drivers/CMSIS/Device/ST/STM32L0xx/Include/
+INC      += -I$(STLIBROOT)/Drivers/STM32L0xx_HAL_Driver/Inc/
+STLIBDIR  = $(STLIBROOT)/Drivers/STM32L0xx_HAL_Driver/Src/
+endif
+
+CC    = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
+AS    = $(TOOLCHAIN)/bin/arm-none-eabi-as
+LN    = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
+STRIP = $(TOOLCHAIN)/bin/arm-none-eabi-strip
+HEX   = $(TOOLCHAIN)/bin/arm-none-eabi-objcopy -O ihex
+BIN   = $(TOOLCHAIN)/bin/arm-none-eabi-objcopy -O binary
+
+DEBUG = gdb
+
+CCOPTS   = -mcpu=$(MCU) -mthumb -c -std=gnu99 -g$(DEBUG)
+CCOPTS  += -fno-common -fmessage-length=0 -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -Os -Wall -Wshadow -Wstrict-aliasing -Wstrict-overflow -Wno-missing-field-initializers
+ASOPTS   = -mcpu=$(MCU) -mthumb -g$(DEBUG)
+LNLIBS   =
+LNOPTS   = -mcpu=$(MCU) -mthumb -Wl,--gc-sections -Wl,-L$(HALDIR) -Wl,-Map=$(BUILDDIR)/$(notdir $(CURDIR)).map
+
+LNOPTS += -Wl,-T$(LD_FILE)
+
+ifeq ($(shell test -d $(PICOMACSRCDIR) && echo true), true)
+PICOMACDIR = $(PICOMACSRCDIR)
+else
+LNOPTS += -Wl,-L$(LIBDIR)
+LNLIBS += -lpicomac
+DEPLIB  = $(LIBDIR)/libpicomac.a
+endif
+
+# FW CONFIG
+FWCFG += -DUSE_BAND_868 -DCFG_sx1276_radio
+
+ifneq ($(VECT_TAB_OFFSET), )
+FWCFG += -DVECT_TAB_OFFSET=$(VECT_TAB_OFFSET)
+endif
+
+# RULES
+
+SRCS = $(wildcard $(OSDIR)/*.c $(UTILSDIR)/*.c $(RADIODIR)/*.c $(SENSORSDIR)/*.c $(HALDIR)/*.c $(HALDIR)/*.s $(MACDIR)/*.c *.c)
+INC += -I$(MACDIR) -I$(PICOMACDIR) -I$(LORAMACDIR) -I$(OSDIR) -I$(UTILSDIR) -I$(RADIODIR) -I$(SENSORSDIR) -I$(HALDIR) -I$(HALINCDIR)
+
+# Source files from ST Library if any
+ifneq ($(STLIBDIR), "")
+SRCS += $(wildcard $(STLIBDIR)/*.c)
+endif
+
+SRCS += $(wildcard $(MACDIR)/*.c)
+
+ifeq ($(ENABLE_PICOMAC), true)
+SRCS += $(wildcard $(PICOMACDIR)/*.c)
+INC += -I$(PICOMACDIR)
+FWCFG += -DCFG_ENABLE_PICOMAC
+endif
+
+ifeq ($(ENABLE_LORAMAC), true)
+SRCS += $(wildcard $(LORAMACDIR)/*.c)
+INC += -I$(LORAMACDIR)
+FWCFG += -DCFG_ENABLE_LORAMAC
+endif
+
+
+OBJS = $(patsubst %, $(BUILDDIR)/%.o, $(notdir $(basename $(SRCS))))
+COMMON_DEPS = $(patsubst %, $(BUILDDIR)/%.d, $(basename $(filter %.c, $(notdir $(SRCS)))))
+
+all: $(BUILDDIR)/$(notdir $(CURDIR)).bin
+
+-include $(COMMON_DEPS)
+
+# template for pattern rule for .c -> .o
+define OC
+$(BUILDDIR)/%.o: $1/%.c Makefile | $(BUILDDIR) show_board
+	@echo "[CC $$@]"
+	@$(CC) $(CCOPTS) $(FWCFG) $(INC) $$< -o$$@
+endef
+
+# template for pattern rule for dependencies .c -> .d
+define DC
+$(BUILDDIR)/%.d: $1/%.c | $(BUILDDIR) show_board
+	@echo "[DEP $$@]"
+	@set -e; rm -f $$@; \
+	$(CC) -MM -MP -MT $$(@:.d=.o) $(CCOPTS) $(FWCFG) $(INC) $$< > $$@
+endef
+
+# This is the tricky part: use template OC and DC to generate the individual pattern rules
+$(foreach d,$(sort $(dir $(SRCS))), $(eval $(call OC,$d)))
+$(foreach d,$(sort $(dir $(SRCS))), $(eval $(call DC,$d)))
+
+$(BUILDDIR)/%.o: $(HALDIR)/%.s | $(BUILDDIR) show_board
+	@echo "[AS $@]"
+	@$(AS) $(ASOPTS) $(INC) $< -o $@
+
+$(BUILDDIR)/%.out: $(OBJS) $(HAL_OBJS) $(DEPLIB)
+	@echo "[LD $@]"
+	@$(LN) $(LNOPTS) -o $@ $^ $(LNLIBS)
+
+$(BUILDDIR)/%.bin: $(BUILDDIR)/%.out
+	@echo "[BIN $@]"
+	@$(BIN) $< $(BINOPTS) $@
+
+ifeq ($(FLASHTOOL), OPENOCD)
+flash: $(BUILDDIR)/$(notdir $(CURDIR)).out
+	@$(OPENOCD_BIN) -f $(OPENOCD_CFG_FILE) -c 'reset_config srst_only connect_assert_srst' -c init -c "reset halt" -c targets -c "poll off" -c "flash write_image erase $(BUILDDIR)/$(notdir $(CURDIR)).out" -c "sleep 100" -c "reset run" -c shutdown
+else ifeq ($(FLASHTOOL), PICOFLASH)
+flash: $(PICOFLASH_BIN) $(BUILDDIR)/$(notdir $(CURDIR)).bin
+	@$(PICOFLASH_BIN) $(PICOFLASH_TTY) $(BUILDDIR)/$(notdir $(CURDIR)).bin
+else
+flash:
+	@echo "This board cannot be flashed with OpenOCD nor PicoFlash (FLASHTOOL not defined)"
+	@echo
+endif
+
+clean:
+	rm -rf $(BUILDDIR)
+
+show_board:
+	@echo
+	@echo "Building for $(BOARD) board !"
+	@echo
+
+$(PICOFLASH_BIN):
+	$(MAKE) -C $(PICOFLASH_FOLDER)
+
+$(BUILDDIR):
+	mkdir -p $@
+
+.PHONY: all flash clean show_board
+
+.SECONDARY:

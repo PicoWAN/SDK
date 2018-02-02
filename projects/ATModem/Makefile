@@ -1,0 +1,12 @@
+# Firmware configuration (FWCFG)
+# Available defines are -DCFG_CONSOLE_RX_ENABLED -DCFG_DISABLE_LOW_POWER_MODE -DCFG_CONSOLE_AT_PREFIX -DCFG_DISABLE_RADIO_IRQ_HANDLER -DCFG_CONSOLE_DEBUG_MAC_DISABLED
+
+# AT Commands can be used
+FWCFG += -DCFG_CONSOLE_AT_PREFIX -DCFG_CONSOLE_RX_ENABLED -DCFG_CONSOLE_DEBUG_MAC_DISABLED
+
+ifeq ($(BOARD), picotag)
+# No low power mode for the PicoTAG when USART RX is enabled
+FWCFG += -DCFG_DISABLE_LOW_POWER_MODE
+endif
+
+include ../projects.gmk
