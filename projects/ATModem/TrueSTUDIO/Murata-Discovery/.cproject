@@ -47,6 +47,7 @@
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/radio"/>
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/sensors"/>
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/stm32/STM32L0"/>
+									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/stm32/includes"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.interwork.1046537130" name="Mix ARM/Thumb" superClass="com.atollic.truestudio.common_options.target.interwork" useByScannerDiscovery="false"/>
 								<inputType id="com.atollic.truestudio.as.input.2042684872" name="Input" superClass="com.atollic.truestudio.as.input"/>
@@ -79,6 +80,7 @@
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/radio"/>
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/sensors"/>
 									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/stm32/STM32L0"/>
+									<listOptionValue builtIn="false" value="../${PicoWANDir}/common/stm32/includes"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.595686714" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.1758707161" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32L072CZ" valueType="enumerated"/>

@@ -355,6 +355,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\common\radio</state>
                     <state>$PROJ_DIR$\..\..\..\..\common\sensors</state>
                     <state>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1</state>
+                    <state>$PROJ_DIR$\..\..\..\..\common\stm32\includes</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\libs\STM32L1xx_StdPeriph_Lib_V1.3.0\Libraries\CMSIS\Include</state>
                 </option>
                 <option>
@@ -2041,6 +2042,39 @@
         </settings>
     </configuration>
     <group>
+        <name>includes</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\accelerometer.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\button.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\flash.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\gpio.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\i2c.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\led.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\spi.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\system.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\tick.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\includes\usart.h</name>
+        </file>
+    </group>
+    <group>
         <name>Mac</name>
         <group>
             <name>LoraMac</name>
@@ -2154,16 +2188,13 @@
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\accelerometer.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\accelerometer.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\arch.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\boards.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\button.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\button.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\clocks.c</name>
@@ -2175,31 +2206,22 @@
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\flash.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\flash.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\gpio.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\gpio.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\i2c-internal.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\i2c-internal.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\i2c.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\i2c.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\led.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\led.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\spi.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\spi.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\iar\startup_stm32l1xx_md_iar.s</name>
@@ -2211,9 +2233,6 @@
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\system.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\system.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\system_stm32l1xx.c</name>
         </file>
         <file>
@@ -2223,13 +2242,7 @@
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\tick.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\tick.h</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\usart.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\common\stm32\STM32L1\usart.h</name>
         </file>
     </group>
     <group>
