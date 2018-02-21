@@ -2271,6 +2271,7 @@ static void internal_rxdone_cb(void)
 	mac_rx_info.snr = status.snr;
 	mac_rx_info.rssi = status.rssi;
 	mac_tx_info.status = MAC_INFO_STATUS_TX_ACK_TIMEOUT;
+	mac_tx_info.waiting_time = 0;
 
 	/* We received something, check if it is a valid message for us */
 	if (status.crc_ok && osal_get_radio_buffer_length() > 0) {
@@ -2672,6 +2673,7 @@ static void internal_txdone_cb(void)
 			mac_tx_info.nb_retries = ack_timeout_retries;
 			mac_tx_info.status = MAC_INFO_STATUS_OK;
 			mac_tx_info.ack_status = UNDEF_ACK;
+			mac_tx_info.waiting_time = 0;
 			/* Send info to the application layer */
 			message_callbacks->mac_tx_done(&mac_tx_info);
 		} else {
@@ -2796,6 +2798,7 @@ static loramac_status_t schedule_tx(void)
 			mac_tx_info.status = MAC_INFO_STATUS_DUTY_CYCLE_LIMITATION;
 			mac_tx_info.nb_retries = ack_timeout_retries_counter;
 			mac_tx_info.ack_status = UNDEF_ACK;
+			mac_tx_info.waiting_time = duty_cycle_time_off;
 			osal_post_job(&tx_done_cb_job, tx_done_cb_event);
 
 			if (mac_state != MAC_STATE_IDLE) {

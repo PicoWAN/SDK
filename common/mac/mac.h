@@ -105,9 +105,10 @@ typedef enum {
  * \brief MAC transmit information.
  */
 typedef struct {
-	mac_info_status_t status;
-	enum ack_status ack_status;
-	uint8_t nb_retries;
+	mac_info_status_t status;			///< Sending status
+	enum ack_status ack_status;			///< Acknowledge status
+	uint8_t nb_retries;				///< Number of sending retries
+	int64_t waiting_time;				///< Time to wait in us before to send again
 } mac_tx_info_t;
 
 /*!
