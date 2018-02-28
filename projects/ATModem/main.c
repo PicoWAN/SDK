@@ -536,13 +536,7 @@ static cmd_ret_val_t nwkskey_cb(char *args)
 		if (!mode_otaa) {
 			del_spaces(args);
 			len = strlen(args);
-			if (args[0] == '?') { // query
-				xprintf("+NWKSKEY: ");
-				for (i = 0; i < 16; i++) {
-					xprintf("%02X", NWKSKEY[i]);
-				}
-				xprintf("\n");
-			} else if (len == 32) {
+			if (len == 32) {
 				for (i = 0; i < 16; i++) {
 					args_double[0] = args[i * 2];
 					args_double[1] = args[i * 2 + 1];
@@ -596,13 +590,7 @@ static cmd_ret_val_t appskey_cb(char *args)
 		if (!mode_otaa) {
 			del_spaces(args);
 			len = strlen(args);
-			if (args[0] == '?') { // query
-				xprintf("+APPSKEY: ");
-				for (i = 0; i < 16; i++) {
-					xprintf("%02X", APPSKEY[i]);
-				}
-				xprintf("\n");
-			} else if (len == 32) {
+			if (len == 32) {
 				for (i = 0; i < 16; i++) {
 					args_double[0] = args[i * 2];
 					args_double[1] = args[i * 2 + 1];
@@ -655,13 +643,7 @@ static cmd_ret_val_t appkey_cb(char *args)
 	if (len != 0) {
 		del_spaces(args);
 		len = strlen(args);
-		if (args[0] == '?') { // query
-			xprintf("+APPKEY: ");
-			for (i = 0; i < 16; i++) {
-				xprintf("%02X", APPKEY[i]);
-			}
-			xprintf("\n");
-		} else if (len == 32) {
+		if (len == 32) {
 			for (i = 0; i < 16; i++) {
 				args_double[0] = args[i * 2];
 				args_double[1] = args[i * 2 + 1];
