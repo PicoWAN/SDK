@@ -956,7 +956,9 @@ static cmd_ret_val_t utx_cb(char *args)
 
 	if (delim <= 0) { // no coma in args
 		delim = strlen(args);
-	} else if (delim > PAYLOAD_S_BUFFER_LEN) { // payload length buffer too small
+	}
+
+	if (delim > PAYLOAD_S_BUFFER_LEN) { // payload length buffer too small
 		xprintf("Payload length too big\n");
 		return CMD_ERROR;
 	} else if ((strlen(args) - (delim + 1)) > TIMEOUT_S_BUFFER_LEN) { // timeout buffer too small
@@ -1011,7 +1013,9 @@ static cmd_ret_val_t ctx_cb(char *args)
 
 	if (delim <= 0) { // no coma in args
 		delim = strlen(args);
-	} else if (delim > PAYLOAD_S_BUFFER_LEN) { // payload length buffer too small
+	}
+
+	if (delim > PAYLOAD_S_BUFFER_LEN) { // payload length buffer too small
 		xprintf("Payload length too big\n");
 		return CMD_ERROR;
 	} else if ((strlen(args) - (delim + 1)) > TIMEOUT_S_BUFFER_LEN) { // timeout buffer too small
