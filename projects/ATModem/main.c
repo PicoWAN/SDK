@@ -1040,7 +1040,7 @@ static cmd_ret_val_t ctx_cb(char *args)
 	strncpy(payload_len_s, args, delim);
 	payload_len = (uint16_t) strtoul(payload_len_s, &endptr, 10);
 	if (endptr == payload_len_s) {
-		xprintf("Syntax error\n");
+		xprintf("No payload\n");
 		return CMD_ERROR;
 	}
 
@@ -1048,7 +1048,7 @@ static cmd_ret_val_t ctx_cb(char *args)
 		strcpy(nb_retries_s, args + delim + 1);
 		nb_retries = (uint16_t) strtoul(nb_retries_s, &endptr, 10);
 		if (endptr == nb_retries_s) {
-			xprintf("Syntax error\n");
+			xprintf("No retries number\n");
 			return CMD_ERROR;
 		}
 
@@ -1056,7 +1056,7 @@ static cmd_ret_val_t ctx_cb(char *args)
 			strcpy(timeout_s, args + delim2 + 1);
 			timeout = (uint32_t) strtoul(timeout_s, &endptr, 10);
 			if (endptr == timeout_s) {
-				xprintf("Syntax error\n");
+				xprintf("No timeout\n");
 				return CMD_ERROR;
 			}
 		}
