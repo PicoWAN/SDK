@@ -984,7 +984,7 @@ static cmd_ret_val_t utx_cb(char *args)
 		}
 	}
 
-	if (payload_len < 250) {
+	if (payload_len <= 250) {
 		tx_confirmed = 0;
 		os_post_delayed_job(&timeout_job, os_get_time() + ms2ostime(timeout), timeout_task);
 		console_register_raw_callback(&raw_cb);
@@ -1062,7 +1062,7 @@ static cmd_ret_val_t ctx_cb(char *args)
 		}
 	}
 
-	if (payload_len < 250) {
+	if (payload_len <= 250) {
 		if (nb_retries <= 255) {
 			tx_confirmed = 1;
 			os_post_delayed_job(&timeout_job, os_get_time() + ms2ostime(timeout), timeout_task);
