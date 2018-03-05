@@ -361,13 +361,16 @@ Please note:
 
 Format:
 
-    AT+CTX=<payload_length>,[timeout]
+    AT+CTX=<payload_length>,[nb_retries],[timeout]
     <payload>
 
 *payload_length*: length of the payload
+*nb_retries*: optional number of retries (default is 2)  
 *timeout*: optional UART time-out for the payload in milliseconds (default is 1 second)
 *payload*: payload in binary
             
+Please note:
+* the nb_retries field must to be set if the timeout field needs to be changed
 
 ## Examples
 

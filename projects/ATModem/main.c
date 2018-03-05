@@ -49,6 +49,7 @@
 
 #define PAYLOAD_S_BUFFER_LEN		5
 #define TIMEOUT_S_BUFFER_LEN		5
+#define NB_RETRIES_S_BUFFER_LEN		3
 
 #define LED0				0
 #define LED1				1
@@ -97,6 +98,7 @@ static uint8_t mode_otaa = 0;
 static uint16_t payload_len = 0;
 static uint8_t tx_confirmed = 0;
 static uint8_t is_joining = 0;
+static uint16_t nb_retries = 2;
 
 static uint8_t payload_buffer[PAYLOAD_BUFFER_SIZE];
 static uint16_t bytes_in_payload_buffer = 0;
@@ -915,7 +917,7 @@ static void raw_cb(uint8_t *args, uint16_t length)
 
 				if (tx_confirmed) {
 					mac_status_t error = mac_send_when_possible_confirmed(port, (uint8_t *) payload_buffer,
-											      bytes_in_payload_buffer, 2, DL_ENABLED);
+											      bytes_in_payload_buffer, (uint8_t) nb_retries, DL_ENABLED);
 					if (error < 0) {
 						xprintf("CTX error: %d\n", error);
 						console_return_error();
@@ -999,9 +1001,12 @@ static cmd_ret_val_t ctx_cb(char *args)
 {
 	char payload_len_s[PAYLOAD_S_BUFFER_LEN] = {0};
 	char timeout_s[TIMEOUT_S_BUFFER_LEN] = {0};
+	char nb_retries_s[NB_RETRIES_S_BUFFER_LEN] = {0};
 	uint32_t timeout = 1000;
-	int32_t delim = 0;
+	int32_t delim = 0, delim2 = 0;
 	char *endptr = NULL;
+
+	nb_retries = 2; // Default retries number
 
 	if (args == NULL) {
 		xprintf("Syntax error\n");
@@ -1010,6 +1015,7 @@ static cmd_ret_val_t ctx_cb(char *args)
 
 	del_spaces(args);
 	delim = strchr(args, ',') - args;
+	delim2 = strchr(args + delim + 1, ',') - args;
 
 	if (delim <= 0) { // no coma in args
 		delim = strlen(args);
@@ -1018,9 +1024,17 @@ static cmd_ret_val_t ctx_cb(char *args)
 	if (delim > PAYLOAD_S_BUFFER_LEN) { // payload length buffer too small
 		xprintf("Payload length too big\n");
 		return CMD_ERROR;
-	} else if ((strlen(args) - (delim + 1)) > TIMEOUT_S_BUFFER_LEN) { // timeout buffer too small
-		xprintf("Timeout too big\n");
-		return CMD_ERROR;
+	} else {
+		if (delim2 <= 0) {
+			delim2 = strlen(args);
+		}
+		if (((delim2 - 1) - delim) > NB_RETRIES_S_BUFFER_LEN) { // retries number buffer too small
+			xprintf("Number of retries too big\n");
+			return CMD_ERROR;
+		} else if ((strlen(args) - (delim2 + 1)) > TIMEOUT_S_BUFFER_LEN) { // timeout buffer too small
+			xprintf("Timeout too big\n");
+			return CMD_ERROR;
+		}
 	}
 
 	strncpy(payload_len_s, args, delim);
@@ -1031,19 +1045,33 @@ static cmd_ret_val_t ctx_cb(char *args)
 	}
 
 	if (delim != strlen(args)) {
-		strcpy(timeout_s, args + delim + 1);
-		timeout = (uint32_t) strtoul(timeout_s, &endptr, 10);
-		if (endptr == timeout_s) {
+		strcpy(nb_retries_s, args + delim + 1);
+		nb_retries = (uint16_t) strtoul(nb_retries_s, &endptr, 10);
+		if (endptr == nb_retries_s) {
 			xprintf("Syntax error\n");
 			return CMD_ERROR;
+		}
+
+		if (delim2 != strlen(args)) {
+			strcpy(timeout_s, args + delim2 + 1);
+			timeout = (uint32_t) strtoul(timeout_s, &endptr, 10);
+			if (endptr == timeout_s) {
+				xprintf("Syntax error\n");
+				return CMD_ERROR;
+			}
 		}
 	}
 
 	if (payload_len < 250) {
-		tx_confirmed = 1;
-		os_post_delayed_job(&timeout_job, os_get_time() + ms2ostime(timeout), timeout_task);
-		console_register_raw_callback(&raw_cb);
-		console_enable_commands(0);
+		if (nb_retries <= 255) {
+			tx_confirmed = 1;
+			os_post_delayed_job(&timeout_job, os_get_time() + ms2ostime(timeout), timeout_task);
+			console_register_raw_callback(&raw_cb);
+			console_enable_commands(0);
+		} else {
+			xprintf("The maximum number of retries is 255\n");
+			return CMD_ERROR;
+		}
 	} else {
 		xprintf("The maximum payload length is 250\n");
 		return CMD_ERROR;
