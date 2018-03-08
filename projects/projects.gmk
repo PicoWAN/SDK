@@ -179,7 +179,7 @@ endif
 OBJS = $(patsubst %, $(BUILDDIR)/%.o, $(notdir $(basename $(SRCS))))
 COMMON_DEPS = $(patsubst %, $(BUILDDIR)/%.d, $(basename $(filter %.c, $(notdir $(SRCS)))))
 
-all: $(BUILDDIR)/$(notdir $(CURDIR)).bin
+all: $(BUILDDIR)/$(notdir $(CURDIR)).bin $(BUILDDIR)/$(notdir $(CURDIR)).hex
 
 -include $(COMMON_DEPS)
 
@@ -213,6 +213,10 @@ $(BUILDDIR)/%.out: $(OBJS) $(HAL_OBJS) $(DEPLIB)
 $(BUILDDIR)/%.bin: $(BUILDDIR)/%.out
 	@echo "[BIN $@]"
 	@$(BIN) $< $(BINOPTS) $@
+
+$(BUILDDIR)/%.hex: $(BUILDDIR)/%.out
+	@echo "[HEX $@]"
+	@$(HEX) $< $(BINOPTS) $@
 
 ifeq ($(FLASHTOOL), OPENOCD)
 flash: $(BUILDDIR)/$(notdir $(CURDIR)).out
