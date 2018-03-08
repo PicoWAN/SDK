@@ -234,6 +234,10 @@ To properly run the PicoWAN and LoRaWAN stacks, the following hardware requireme
 
 ## History
 
+v2.0.1:
+* Add missing udev rules file for PicoFlash
+* Fix wrong include paths in IAR and TrueSTUDIO projects
+
 v2.0:
 * Initial public version of the SDK
 
