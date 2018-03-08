@@ -61,7 +61,7 @@ void lora_mac_set_channels_datarate(int8_t datarate);
 /*!
  * \brief   Enables/disables repeater support.
  *
- * \param   enable 1 to enable ADR, 0 to disable it.
+ * \param   enable 1 to enable repeater support, 0 to disable it.
  */
 void lora_mac_set_repeater_support(uint8_t enable);
 
