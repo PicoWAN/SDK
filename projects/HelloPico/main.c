@@ -301,7 +301,7 @@ static void send_task(os_job_t *j)
 	os_cancel_job(&turn_off_leds_job);
 	turn_off_leds_task(NULL);
 
-	if (mac_send_when_possible_confirmed(MAC_PORT_FIRST_APP, data, sizeof(data), 2, DL_DISABLED) < 0) {
+	if (mac_send_when_possible_confirmed(MAC_PORT_FIRST_APP, data, sizeof(data), 2, DL_ENABLED) < 0) {
 		xprintf("The frame cannot be sent\n");
 	}
 }
