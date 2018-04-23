@@ -2538,6 +2538,13 @@ static void internal_rxdone_cb(void)
 			mac_state = MAC_STATE_IDLE;
 			mac_rx_info.status = MAC_INFO_STATUS_DOWNLINK_DECODING_ERROR;
 		}
+		// Increment uplink counter if we receive a frame after an unconfirmed frame
+		if (message_ack_request(&message_tx_rx) == WITHOUT_ACK) {
+			uplink_counter++;
+			if (is_loramac_network_ABP && (flash_callback != NULL) && (flash_callback->save_uplink_counter != NULL)) {
+				flash_callback->save_uplink_counter(uplink_counter);
+			}
+		}
 	} else {
 		if ((rx_slot == 1) && (message_ack_request(&message_tx_rx) == WITHOUT_ACK)) {
 			// Retransmission unconfirmed uplink frame, to increase radio performance.
