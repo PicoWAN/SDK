@@ -676,6 +676,11 @@ uint8_t open_receive_window = 1;
 static uint8_t is_loramac_network_joined = 0;
 
 /*!
+ * Indicates if the MAC layer is trying to join network by OTA.
+ */
+static uint8_t is_trying_to_join_OTA = 0;
+
+/*!
  * Indicates if the MAC layer is in ABP mode.
  */
 static uint8_t is_loramac_network_ABP = 0;
@@ -2579,12 +2584,16 @@ end_function:
 		}
 		if (message_ack_request(&message_tx_rx) == WITH_ACK) {
 			if ((mac_tx_info.status == MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
-				if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
-					mac_tx_info.nb_retries = ack_timeout_retries_counter;
-					/* Send the payload to the application layer */
-					message_callbacks->mac_tx_done(&mac_tx_info);
-				} else {
-					osal_printf("MAC: no callback set for tx\n");
+				if (!is_trying_to_join_OTA) {
+					if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
+						mac_tx_info.nb_retries = ack_timeout_retries_counter;
+						/* Send the payload to the application layer */
+						message_callbacks->mac_tx_done(&mac_tx_info);
+					} else {
+						osal_printf("MAC: no callback set for tx\n");
+					}
+				} else if ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1)){
+					is_trying_to_join_OTA = 0;
 				}
 			}
 		}
@@ -3075,6 +3084,7 @@ static mac_status_t loramac_init_activation_on_air(uint8_t *dev_eui, uint8_t *ap
 	loramac_status_t schedule_state;
 
 	is_loramac_network_joined = 0;
+	is_trying_to_join_OTA = 1;
 
 	osal_memcpy(dev_deveui, dev_eui, sizeof(dev_deveui));
 	osal_memcpy(dev_appeui, app_eui, sizeof(dev_appeui));
