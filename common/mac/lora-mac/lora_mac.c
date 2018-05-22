@@ -2586,6 +2586,18 @@ end_function:
 			if ((mac_tx_info.status == MAC_INFO_STATUS_OK) || ((ack_timeout_retries_counter >= ack_timeout_retries) && (rx_slot == 1))) {
 				if (!is_trying_to_join_OTA) {
 					if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
+						// Select channel
+						osal_time_t next_send_duty_cycle = 0;
+						calculate_back_off(last_tx_channel);
+						while (set_next_channel(&next_send_duty_cycle) == 0) {
+							// Set the default datarate
+							loramac_params.channels_datarate = loramac_params_defaults.channels_datarate;
+
+							// Re-enable default channels LC1, LC2, LC3
+							loramac_params.channels_mask[0] = loramac_params.channels_mask[0] | (LC(1) + LC(2) + LC(3));
+						}
+						mac_tx_info.waiting_time = next_send_duty_cycle;
+
 						mac_tx_info.nb_retries = ack_timeout_retries_counter;
 						/* Send the payload to the application layer */
 						message_callbacks->mac_tx_done(&mac_tx_info);
@@ -2686,10 +2698,21 @@ static void internal_txdone_cb(void)
 		osal_printf("Without ACK\n");
 		channels_nb_rep_counter++;
 		if (message_callbacks != NULL && message_callbacks->mac_tx_done) {
+			// Select channel
+			osal_time_t next_send_duty_cycle = 0;
+			calculate_back_off(last_tx_channel);
+			while (set_next_channel(&next_send_duty_cycle) == 0) {
+				// Set the default datarate
+				loramac_params.channels_datarate = loramac_params_defaults.channels_datarate;
+
+				// Re-enable default channels LC1, LC2, LC3
+				loramac_params.channels_mask[0] = loramac_params.channels_mask[0] | (LC(1) + LC(2) + LC(3));
+			}
+			mac_tx_info.waiting_time = next_send_duty_cycle;
+
 			mac_tx_info.nb_retries = ack_timeout_retries;
 			mac_tx_info.status = MAC_INFO_STATUS_OK;
 			mac_tx_info.ack_status = UNDEF_ACK;
-			mac_tx_info.waiting_time = 0;
 			/* Send info to the application layer */
 			message_callbacks->mac_tx_done(&mac_tx_info);
 		} else {
