@@ -31,4 +31,12 @@
 #ifndef _PICOMAC_H_
 #define _PICOMAC_H_
 
+
+/*!
+ * \brief   Enables/disables the duty cycle limitation (for test purpose).
+ *
+ * \param   enable 1 to enable the limitation, 0 to disable it.
+ */
+void pico_mac_test_set_duty_cycle(uint8_t enable);
+
 #endif /* _PICOMAC_H_ */
