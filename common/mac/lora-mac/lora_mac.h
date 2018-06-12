@@ -44,8 +44,9 @@ void lora_mac_set_adr(uint8_t enable);
 /*!
  * \brief   Sets the channels TX output power.
  *
- * \param   tx_power The TX output power. Allowed values are TX_POWER_20_DBM, TX_POWER_14_DBM,
- *                   TX_POWER_11_DBM, TX_POWER_08_DBM, TX_POWER_05_DBM, TX_POWER_02_DBM.
+ * \param   tx_power The TX output power. Allowed values are TX_POWER_16_DBM, TX_POWER_14_DBM,
+ *                   TX_POWER_12_DBM, TX_POWER_10_DBM, TX_POWER_08_DBM, TX_POWER_06_DBM,
+ *                   TX_POWER_04_DBM, TX_POWER_02_DBM.
  */
 void lora_mac_set_channels_tx_power(int8_t tx_power);
 
@@ -53,8 +54,7 @@ void lora_mac_set_channels_tx_power(int8_t tx_power);
  * \brief   Sets the channels datarate.
  *
  * \param   datarate The new datarate. Allowed values are:
- *                   * EU868 - [DR_0, DR_1, DR_2, DR_3, DR_4, DR_5, DR_6, DR_7]
- *                   * US915 - [DR_0, DR_1, DR_2, DR_3, DR_4]
+ *                   * EU868 - [DR_0, DR_1, DR_2, DR_3, DR_4, DR_5, DR_6]
  */
 void lora_mac_set_channels_datarate(int8_t datarate);
 
