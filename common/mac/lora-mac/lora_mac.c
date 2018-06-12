@@ -509,11 +509,6 @@ typedef enum {
 #define LORAMAC_RX_MAX_DATARATE		DR_7
 
 /*!
- * Default datarate used by the node
- */
-#define LORAMAC_DEFAULT_DATARATE	DR_0
-
-/*!
  * Minimal Rx1 receive datarate offset
  */
 #define LORAMAC_MIN_RX1_DR_OFFSET	0
@@ -532,35 +527,6 @@ typedef enum {
  * Maximal Tx output power that can be used by the node
  */
 #define LORAMAC_MAX_TX_POWER		TX_POWER_16_DBM
-
-/*!
- * Default Tx output power used by the node
- */
-#define LORAMAC_DEFAULT_TX_POWER	TX_POWER_16_DBM
-
-/*!
- * LoRaMac TxPower definition
- */
-#define TX_POWER_16_DBM			0
-#define TX_POWER_14_DBM			1
-#define TX_POWER_12_DBM			2
-#define TX_POWER_10_DBM			3
-#define TX_POWER_08_DBM			4
-#define TX_POWER_06_DBM			5
-#define TX_POWER_04_DBM			6
-#define TX_POWER_02_DBM			7
-
-/*!
- * LoRaMac datarates definition
- */
-#define DR_0 				0  // SF12 - BW125
-#define DR_1 				1  // SF11 - BW125
-#define DR_2 				2  // SF10 - BW125
-#define DR_3 				3  // SF9  - BW125
-#define DR_4 				4  // SF8  - BW125
-#define DR_5 				5  // SF7  - BW125
-#define DR_6 				6  // SF7  - BW250
-#define DR_7 				7  // FSK
 
 /*!
  * Second reception window channel definition.
@@ -760,6 +726,16 @@ loramac_params_t loramac_params;
  * LoRaMac default parameters
  */
 loramac_params_t loramac_params_defaults;
+
+/*!
+ * Default datarate used by the node
+ */
+uint8_t loramac_default_datarate = DR_0;
+
+/*!
+ * Default Tx output power used by the node
+ */
+uint8_t loramac_default_tx_power = TX_POWER_16_DBM;
 
 /*!
  * Uplink messages repetitions counter
@@ -3008,8 +2984,8 @@ static void loramac_init(mac_message_callbacks_t *cb, mac_battery_callback_t *ba
 	duty_cycle_on = 1;
 
 	// Reset to defaults
-	loramac_params_defaults.channels_tx_power = LORAMAC_DEFAULT_TX_POWER;
-	loramac_params_defaults.channels_datarate = LORAMAC_DEFAULT_DATARATE;
+	loramac_params_defaults.channels_tx_power = loramac_default_tx_power;
+	loramac_params_defaults.channels_datarate = loramac_default_datarate;
 
 	loramac_params_defaults.max_rx_window = MAX_RX_WINDOW;
 	loramac_params_defaults.receive_delay_1 = RECEIVE_DELAY1;
@@ -3330,6 +3306,28 @@ uint16_t lora_mac_max_message_length(void)
 void lora_mac_set_rx2_datarate(uint8_t dr)
 {
 	loramac_params.rx2_channel.datarate = dr;
+}
+
+/*!
+ * \brief   Sets the default TX output power.
+ *
+ * \param   tx_power The TX output power. Allowed values are TX_POWER_16_DBM, TX_POWER_14_DBM,
+ *                   TX_POWER_12_DBM, TX_POWER_10_DBM, TX_POWER_08_DBM, TX_POWER_06_DBM, TX_POWER_04_DBM, TX_POWER_02_DBM.
+ */
+void lora_mac_set_default_tx_power(int8_t tx_power)
+{
+	loramac_default_tx_power = tx_power;
+}
+
+/*!
+ * \brief   Sets the default datarate.
+ *
+ * \param   datarate The new datarate. Allowed values are:
+ *                   * EU868 - [DR_0, DR_1, DR_2, DR_3, DR_4, DR_5, DR_6]
+ */
+void lora_mac_set_default_datarate(int8_t datarate)
+{
+	loramac_default_datarate = datarate;
 }
 
 /*!

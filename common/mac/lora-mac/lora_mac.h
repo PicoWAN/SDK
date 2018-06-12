@@ -35,6 +35,30 @@
 
 
 /*!
+ * LoRaMac datarates definition
+ */
+#define DR_0 				0  // SF12 - BW125
+#define DR_1 				1  // SF11 - BW125
+#define DR_2 				2  // SF10 - BW125
+#define DR_3 				3  // SF9  - BW125
+#define DR_4 				4  // SF8  - BW125
+#define DR_5 				5  // SF7  - BW125
+#define DR_6 				6  // SF7  - BW250
+#define DR_7 				7  // FSK
+
+/*!
+ * LoRaMac TxPower definition
+ */
+#define TX_POWER_16_DBM			0
+#define TX_POWER_14_DBM			1
+#define TX_POWER_12_DBM			2
+#define TX_POWER_10_DBM			3
+#define TX_POWER_08_DBM			4
+#define TX_POWER_06_DBM			5
+#define TX_POWER_04_DBM			6
+#define TX_POWER_02_DBM			7
+
+/*!
  * \brief   Enables/disables the ADR (Adaptive Data Rate).
  *
  * \param   enable 1 to enable ADR, 0 otherwise.
@@ -85,6 +109,23 @@ uint8_t lora_mac_get_last_nb_gateways(void);
  * \param   dr The datarate to set (DR_n where n can be 0-6).
  */
 void lora_mac_set_rx2_datarate(uint8_t dr);
+
+/*!
+ * \brief   Sets the default TX output power.
+ *
+ * \param   tx_power The TX output power. Allowed values are TX_POWER_16_DBM, TX_POWER_14_DBM,
+ *                   TX_POWER_12_DBM, TX_POWER_10_DBM, TX_POWER_08_DBM, TX_POWER_06_DBM,
+ *                   TX_POWER_04_DBM, TX_POWER_02_DBM.
+ */
+void lora_mac_set_default_tx_power(int8_t tx_power);
+
+/*!
+ * \brief   Sets the default datarate.
+ *
+ * \param   datarate The new datarate. Allowed values are:
+ *                   * EU868 - [DR_0, DR_1, DR_2, DR_3, DR_4, DR_5, DR_6]
+ */
+void lora_mac_set_default_datarate(int8_t datarate);
 
 /*!
  * \brief   Enables/disables the duty cycle limitation (for test purpose).
