@@ -2661,7 +2661,7 @@ static void internal_txdone_cb(void)
 	if (loramac_device_class != CLASS_C) {
 		osal_post_delayed_job(&rx2_job, timestamp_tx_done + ms2us(rx_windows2_delay), on_rx_window2_timer_event);
 	}
-	if ((loramac_device_class == CLASS_C) || (message_ack == WITH_ACK)) {
+	if ((loramac_device_class == CLASS_C) || ((message_ack == WITH_ACK) && (is_trying_to_join_OTA == 0))) {
 		osal_post_delayed_job(&ack_timeout_job,
 				      timestamp_tx_done + ms2us(rx_windows2_delay + ACK_TIMEOUT + randr(-ACK_TIMEOUT_RND, ACK_TIMEOUT_RND)),
 				      on_ack_timeout_timer_event);
