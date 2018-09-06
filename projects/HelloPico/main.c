@@ -56,7 +56,9 @@
 #define LED1				1
 
 /* Define this only if you plan to do a LoRaWAN application that needs to be certified */
+#if ENABLE_LORAMAC
 #define LORA_CERTIFICATION_ENABLED
+#endif
 
 
 #ifdef CFG_picotag_board

@@ -156,6 +156,8 @@ endif
 SRCS = $(wildcard $(OSDIR)/*.c $(UTILSDIR)/*.c $(RADIODIR)/*.c $(SENSORSDIR)/*.c $(HALDIR)/*.c $(HALDIR)/*.s $(MACDIR)/*.c *.c)
 INC += -I$(MACDIR) -I$(PICOMACDIR) -I$(LORAMACDIR) -I$(OSDIR) -I$(UTILSDIR) -I$(RADIODIR) -I$(SENSORSDIR) -I$(HALDIR) -I$(HALINCDIR)
 
+SRCS := $(filter-out $(UTILSDIR)/lora_certif.c, $(SRCS))
+
 # Source files from ST Library if any
 ifneq ($(STLIBDIR), "")
 SRCS += $(wildcard $(STLIBDIR)/*.c)
@@ -170,7 +172,7 @@ FWCFG += -DCFG_ENABLE_PICOMAC
 endif
 
 ifeq ($(ENABLE_LORAMAC), true)
-SRCS += $(wildcard $(LORAMACDIR)/*.c)
+SRCS += $(wildcard $(LORAMACDIR)/*.c) $(UTILSDIR)/lora_certif.c
 INC += -I$(LORAMACDIR)
 FWCFG += -DCFG_ENABLE_LORAMAC
 endif
