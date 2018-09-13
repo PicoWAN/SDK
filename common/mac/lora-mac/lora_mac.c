@@ -47,7 +47,7 @@
 #define RX_TX_CRC			OSAL_CRC_ON
 
 #define RADIO_CONFIG_TIME		3000 // us
-#define CPU_WAKEUP_TIME			5 // ms
+#define CPU_WAKEUP_TIME			osal_get_additional_cpu_wakeup_latency() // us
 
 //#define CFG_SUPPORT_CLASS_C
 
@@ -2848,7 +2848,7 @@ static void send_packet(uint32_t freq, enum osal_sf_t sf, enum osal_bw_t bw, uin
 	osal_write_radio_buffer(data, len);
 
 	tx_time_on_air = get_time_on_air(len);
-	timestamp_tx_done = osal_get_time() + (tx_time_on_air * 90) / 100 - ms2us(CPU_WAKEUP_TIME);
+	timestamp_tx_done = osal_get_time() + (tx_time_on_air * 90) / 100 - CPU_WAKEUP_TIME;
 	osal_post_delayed_job(&lock_low_power_job, timestamp_tx_done, lock_low_power_event);
 
 	/* Setup radio callback */
