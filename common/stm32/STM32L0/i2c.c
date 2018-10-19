@@ -138,14 +138,14 @@ void i2c_power_down(i2c_port_t i2c_port)
 	}
 }
 
-void i2c_block_write(i2c_port_t i2c_port, uint8_t addr, uint8_t *data, uint8_t len)
+void i2c_write(i2c_port_t i2c_port, uint8_t addr, uint8_t *data, uint8_t len)
 {
 	I2C_HandleTypeDef *hi2c = i2c_lookup(i2c_port);
 
 	HAL_I2C_Master_Transmit(hi2c, addr, data, len, HAL_MAX_DELAY);
 }
 
-void i2c_block_read(i2c_port_t i2c_port, uint8_t addr, uint8_t *data, uint8_t len)
+void i2c_read(i2c_port_t i2c_port, uint8_t addr, uint8_t *data, uint8_t len)
 {
 	I2C_HandleTypeDef *hi2c = i2c_lookup(i2c_port);
 
