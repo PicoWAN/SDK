@@ -1,7 +1,7 @@
 ROOT = ../../..
 
 # GNU ARM Embedded Toolchain location
-TOOLCHAIN = $(ROOT)/toolchain/gcc-arm-none-eabi-6-2017-q2-update
+TOOLCHAIN ?= $(ROOT)/toolchain/gcc-arm-none-eabi-6-2017-q2-update
 
 # Board selection
 BOARD ?= discovery_stm32l1
