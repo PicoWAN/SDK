@@ -135,6 +135,7 @@ LN    = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
 STRIP = $(TOOLCHAIN)/bin/arm-none-eabi-strip
 HEX   = $(TOOLCHAIN)/bin/arm-none-eabi-objcopy -O ihex
 BIN   = $(TOOLCHAIN)/bin/arm-none-eabi-objcopy -O binary
+GDB   = $(TOOLCHAIN)/bin/arm-none-eabi-gdb
 
 DEBUG = gdb
 
@@ -242,6 +243,9 @@ flash:
 	@echo
 endif
 
+gdb: $(BUILDDIR)/$(notdir $(CURDIR)).out
+	$(GDB) $<
+
 clean:
 	rm -rf $(BUILDDIR)
 
@@ -256,6 +260,6 @@ $(PICOFLASH_BIN):
 $(BUILDDIR):
 	mkdir -p $@
 
-.PHONY: all flash clean show_board
+.PHONY: all flash clean show_board gdb
 
 .SECONDARY:

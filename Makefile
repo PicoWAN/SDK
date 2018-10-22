@@ -28,6 +28,9 @@ buildall:	$(patsubst $(PROJECTS_DIR)/%/,%,$(filter %/, $(wildcard $(PROJECTS_DIR
 	@echo " -> Project $(patsubst %-flash,%,$@) has been flashed"
 	@echo
 
+%-gdb:
+	$(MAKE) -C $(PROJECTS_DIR)/$(patsubst %-gdb,%,$@) gdb
+
 %-clean:
 	$(MAKE) -C $(PROJECTS_DIR)/$(patsubst %-clean,%,$@) clean
 	@echo
