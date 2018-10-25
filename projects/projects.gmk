@@ -88,6 +88,14 @@ ifeq ($(BOARD), picoshield)
 	HALTYPE = STM32L0
 	LD_FILE ?= stm32l0xxxz.ld
 endif
+ifeq ($(BOARD), picoshieldv2)
+	# STM32L072 48-pin
+	FWCFG  += -DSTM32L072xx
+	FWCFG  += -DSECTION_PRIVATE_START=0x0 -DSECTION_PRIVATE_LENGTH=0xC00 -DSECTION_COMMON_START=0xC00 -DSECTION_COMMON_LENGTH=0xC00
+	FWCFG  += -DARM_MATH_CM0PLUS
+	HALTYPE = STM32L0
+	LD_FILE ?= stm32l0xxxz.ld
+endif
 
 ifeq ($(BOARD), picosmarttagv2)
 	# STM32L07[23] 48-pin

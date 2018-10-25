@@ -2,6 +2,16 @@ PROJECTS_DIR = projects
 BUILD_DIR = build
 export BOARD ?= murata_discovery
 
+BOARDS = \
+		 discovery_stm32l1 \
+		 picotag \
+		 murata_sychip \
+		 murata_discovery \
+		 murata_module \
+		 nucleo \
+		 picoshield \
+		 picoshieldv2 \
+		 picosmarttagv2
 
 APP_LIST = $(wildcard $(PROJECTS_DIR)/*)
 
@@ -14,7 +24,7 @@ all:
 	@echo "   $$ make <target>-clean									to clean <target>"
 	@echo "   $$ make clean											to clean all targets"
 	@echo
-	@echo "   Available boards: \"discovery_stm32l1\", \"picotag\", \"murata_sychip\", \"murata_discovery\", \"murata_module\", \"nucleo\", \"picoshield\", \"picosmarttagv2\""
+	@echo "   Available boards: $(foreach b,$(BOARDS), \"$(b)\")"
 	@echo
 	@echo "   Possible targets: $(patsubst $(PROJECTS_DIR)/%/,\"%\",$(filter %/, $(wildcard $(PROJECTS_DIR)/*/)))"
 	@echo

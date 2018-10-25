@@ -43,6 +43,8 @@
 #include "nucleo_board.h"
 #elif defined(CFG_picoshield_board)
 #include "picoshield_board.h"
+#elif defined(CFG_picoshieldv2_board)
+#include "picoshieldv2_board.h"
 #elif defined(CFG_picosmarttagv2_board)
 #include "picosmarttagv2_board.h"
 #else
