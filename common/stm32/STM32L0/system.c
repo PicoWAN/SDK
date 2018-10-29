@@ -609,7 +609,9 @@ void system_sleep_low_power(void)
 
 	/* Reset RCC (MSI as System Clock) */
 	/* Set MSION bit */
-	RCC->CR |= (uint32_t) 0x00000100;
+	RCC->CR |= (uint32_t) RCC_CR_MSION;
+	/* Wait until MSI is ready */
+	while ((RCC->CR & RCC_CR_MSIRDY) == RESET);
 	/* Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and MCOPRE[2:0] bits */
 	RCC->CFGR &= (uint32_t) 0x88FF400C;
 	/* Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
@@ -682,6 +684,9 @@ void system_sleep_low_power(void)
 
 	/* Wait until PLL is used as system clock source */
 	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (uint32_t) RCC_CFGR_SWS_PLL);
+
+	// Disable MSI
+	RCC->CR &= ~((uint32_t) RCC_CR_MSION);
 
 	/* HCLK = SYSCLK/1 */
 	RCC->CFGR = (RCC->CFGR & (uint32_t) ((uint32_t) ~RCC_CFGR_HPRE)) | (uint32_t) RCC_CFGR_HPRE_DIV1;
