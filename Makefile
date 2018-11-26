@@ -14,7 +14,7 @@ all:
 	@echo "   $$ make <target>-clean									to clean <target>"
 	@echo "   $$ make clean											to clean all targets"
 	@echo
-	@echo "   Available boards: \"discovery_stm32l1\", \"picotag\", \"murata_sychip\", \"murata_discovery\", \"murata_module\", \"nucleo\", \"picoshield\""
+	@echo "   Available boards: \"discovery_stm32l1\", \"picotag\", \"murata_sychip\", \"murata_discovery\", \"murata_module\", \"nucleo\", \"picoshield\", \"picosmarttagv2\""
 	@echo
 	@echo "   Possible targets: $(patsubst $(PROJECTS_DIR)/%/,\"%\",$(filter %/, $(wildcard $(PROJECTS_DIR)/*/)))"
 	@echo

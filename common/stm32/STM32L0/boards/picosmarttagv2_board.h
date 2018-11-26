@@ -1,0 +1,172 @@
+/* ***********************************************************************************
+ *
+ * Archos SmartTag V2
+ *
+ *************************************************************************************/
+
+#pragma once
+
+#define USE_RX_PIN			// Comment to use the red LED
+
+#define HAS_TCXO
+
+#define HAS_LIS2DE12_ACCELEROMETER
+
+// RF characteristics
+#define MAX_RF_POWER			20 // dBm
+#define MIN_RF_POWER			0 // dBm
+#define ANTENNA_GAIN			-6 // dBi
+// QORVO LNA with nominal gain of 14dB
+#define LNA_GAIN			14 // dB
+
+// GPIOs
+#define NSS_PORT			GPIO_PORT_B  // PB0
+#define NSS_PIN				0
+
+#define RX_PORT				GPIO_PORT_B // PB6
+#define RX_PIN				6
+#define TX_RFO_PORT			GPIO_PORT_C // PC2
+#define TX_RFO_PIN			2
+#define TX_PA_PORT			GPIO_PORT_A // PA4
+#define TX_PA_PIN			4
+#define TCXO_PORT			GPIO_PORT_H // PH1
+#define TCXO_PIN			1
+
+#define RST_PORT			GPIO_PORT_B // PB13
+#define RST_PIN				13
+
+#define DIO0_PORT			GPIO_PORT_B // PB4
+#define DIO0_PIN			4
+#define DIO0_TYPE			GPIO_PUPD_NONE
+#define DIO1_PORT			GPIO_PORT_B // PB1
+#define DIO1_PIN			1
+#define DIO1_TYPE			GPIO_PUPD_NONE
+#define DIO2_PORT			GPIO_PORT_A // PA3
+#define DIO2_PIN			3
+#define DIO2_TYPE			GPIO_PUPD_NONE
+#define DIO3_PORT			GPIO_PORT_H // PH0
+#define DIO3_PIN			0
+#define DIO3_TYPE			GPIO_PUPD_NONE
+#define DIO4_PORT			GPIO_PORT_C // PC13
+#define DIO4_PIN			13
+#define DIO4_TYPE			GPIO_PUPD_NONE
+
+#define LED0_PORT			GPIO_PORT_A  // Blue LED: PA8 / Shared with MCO
+#define LED0_PIN			8
+#define LED0_MODE			LED_ACTIVE_HIGH
+#ifndef USE_RX_PIN
+#define LED1_PORT			GPIO_PORT_A // Red LED: PA10 / Shared with RX1
+#define LED1_PIN			10
+#define LED1_MODE			LED_ACTIVE_HIGH
+#endif
+
+#define BUTTON0_PORT			GPIO_PORT_B // PB5
+#define BUTTON0_PIN			5
+#define BUTTON0_MODE			BUTTON_ACTIVE_LOW
+#define BUTTON0_TYPE			GPIO_PUPD_UP
+
+// magnetometer sensor
+#define BUTTON1_PORT			GPIO_PORT_B // PB12
+#define BUTTON1_PIN			12
+#define BUTTON1_MODE			BUTTON_ACTIVE_LOW
+#define BUTTON1_TYPE			GPIO_PUPD_UP
+
+#define WIFI_GPIO0_PORT			GPIO_PORT_A // PA0
+#define WIFI_GPIO0_PIN			0
+#define WIFI_GPIO0_TYPE			GPIO_PUPD_NONE
+#define WIFI_ENABLE_PORT		GPIO_PORT_B // PB3
+#define WIFI_ENABLE_PIN			3
+
+#define ACC1_PORT			GPIO_PORT_B // PB14
+#define ACC1_PIN			14
+#define ACC1_TYPE			GPIO_PUPD_NONE
+#define ACC2_PORT			GPIO_PORT_B // PB15
+#define ACC2_PIN			15
+#define ACC2_TYPE			GPIO_PUPD_NONE
+
+#define BATT_ANA_PORT			GPIO_PORT_A // PA2
+#define BATT_ANA_PIN			2
+#define BATT_ANA_CHAN			ADC_Channel_2
+#define BATT_MEAS_PORT			GPIO_PORT_A // PA15
+#define BATT_MEAS_PIN			15
+#define BATT_SYNC_PORT			GPIO_PORT_A // PA1
+#define BATT_SYNC_PIN			1
+
+#define OUTPUT_PINS			{{NSS_PORT, NSS_PIN}, {RX_PORT, RX_PIN}, {TX_RFO_PORT, TX_RFO_PIN}, \
+					 {TX_PA_PORT, TX_PA_PIN}, {LED0_PORT, LED0_PIN}, /*{LED1_PORT, LED1_PIN},*/ \
+					 {WIFI_ENABLE_PORT, WIFI_ENABLE_PIN}, \
+					 {BATT_MEAS_PORT, BATT_MEAS_PIN}, {BATT_SYNC_PORT, BATT_SYNC_PIN}, \
+					 {TCXO_PORT, TCXO_PIN}}
+#define INPUT_PINS			{{DIO0_PORT, DIO0_PIN, DIO0_TYPE}, {DIO1_PORT, DIO1_PIN, DIO1_TYPE}, {DIO2_PORT, DIO2_PIN, DIO2_TYPE}, \
+					 {DIO3_PORT, DIO3_PIN, DIO3_TYPE}, {DIO4_PORT, DIO4_PIN, DIO4_TYPE}, \
+					 {BUTTON0_PORT, BUTTON0_PIN, BUTTON0_TYPE}, {BUTTON1_PORT, BUTTON1_PIN, BUTTON1_TYPE}, \
+					 {ACC1_PORT, ACC1_PIN, ACC1_TYPE}, {ACC2_PORT, ACC2_PIN, ACC2_TYPE}}
+
+// SPI
+#define SCK_PORT			GPIO_PORT_A // SCK:  PA5
+#define SCK_PIN				5
+#define MISO_PORT			GPIO_PORT_A // MISO: PA6
+#define MISO_PIN			6
+#define MOSI_PORT			GPIO_PORT_A // MOSI: PA7
+#define MOSI_PIN			7
+
+#define GPIO_AF_SPI1			0x00
+
+// I2C
+#define SCL_PORT			GPIO_PORT_B // SCL:  PB8
+#define SCL_PIN				8
+#define SDA_PORT			GPIO_PORT_B // SDA:  PB9
+#define SDA_PIN				9
+
+#define GPIO_AF_I2C			0x04
+
+#define ACC_I2C_PORT			I2C_PORT_1
+
+// Console USART
+#define CONSOLE_USART			USART_PORT_1
+#define CONSOLE_USART_TX_PORT		GPIO_PORT_A // PA9
+#define CONSOLE_USART_TX_PIN		9
+#ifdef USE_RX_PIN
+#define CONSOLE_USART_RX_PORT		GPIO_PORT_A // P10 / Shared with LED1
+#define CONSOLE_USART_RX_PIN		10
+#endif
+
+#define CONSOLE_USART_AF		0x04
+
+// Wifi USART
+#define WIFI_USART			LPUART_PORT_1
+#define WIFI_USART_TX_PORT		GPIO_PORT_B // P10
+#define WIFI_USART_TX_PIN		10
+#define WIFI_USART_RX_PORT		GPIO_PORT_B // P11
+#define WIFI_USART_RX_PIN		11
+#define WIFI_USART_AF			0x04
+
+#ifndef USE_RX_PIN
+#define LOWPOWER_PINS			{{NSS_PORT, NSS_PIN}, {TX_RFO_PORT, TX_RFO_PIN}, {RX_PORT, RX_PIN}, \
+					 {TX_PA_PORT, TX_PA_PIN}, {RST_PORT, RST_PIN}, \
+					 {DIO0_PORT, DIO0_PIN}, {DIO1_PORT, DIO1_PIN}, {DIO2_PORT, DIO2_PIN}, \
+					 {DIO3_PORT, DIO3_PIN}, {DIO4_PORT, DIO4_PIN}, \
+					 {SCK_PORT, SCK_PIN}, {MISO_PORT, MISO_PIN}, {MOSI_PORT, MOSI_PIN}, \
+					 {LED0_PORT, LED0_PIN}, {LED1_PORT, LED1_PIN}, \
+					 {BUTTON0_PORT, BUTTON0_PIN}, {BUTTON1_PORT, BUTTON1_PIN}, \
+					 {SCL_PORT, SCL_PIN}, {SDA_PORT, SDA_PIN}, \
+					 {ACC1_PORT, ACC1_PIN}, {ACC2_PORT, ACC2_PIN}, \
+					 {WIFI_ENABLE_PORT, WIFI_ENABLE_PIN}, \
+					 {WIFI_USART_TX_PORT, WIFI_USART_TX_PIN}, {WIFI_USART_RX_PORT, WIFI_USART_RX_PIN}, \
+					 {BATT_MEAS_PORT, BATT_MEAS_PIN}, {BATT_SYNC_PORT, BATT_SYNC_PIN}, \
+					 {TCXO_PORT, TCXO_PIN}}
+#else
+#define LOWPOWER_PINS			{{NSS_PORT, NSS_PIN}, {TX_RFO_PORT, TX_RFO_PIN}, {RX_PORT, RX_PIN}, \
+					 {TX_PA_PORT, TX_PA_PIN}, {RST_PORT, RST_PIN}, \
+					 {DIO0_PORT, DIO0_PIN}, {DIO1_PORT, DIO1_PIN}, {DIO2_PORT, DIO2_PIN}, \
+					 {DIO3_PORT, DIO3_PIN}, {DIO4_PORT, DIO4_PIN}, \
+					 {SCK_PORT, SCK_PIN}, {MISO_PORT, MISO_PIN}, {MOSI_PORT, MOSI_PIN}, \
+					 {LED0_PORT, LED0_PIN}, \
+					 {BUTTON0_PORT, BUTTON0_PIN}, {BUTTON1_PORT, BUTTON1_PIN}, \
+					 {SCL_PORT, SCL_PIN}, {SDA_PORT, SDA_PIN}, \
+					 {ACC1_PORT, ACC1_PIN}, {ACC2_PORT, ACC2_PIN}, \
+					 {WIFI_ENABLE_PORT, WIFI_ENABLE_PIN}, \
+					 {WIFI_USART_TX_PORT, WIFI_USART_TX_PIN}, {WIFI_USART_RX_PORT, WIFI_USART_RX_PIN}, \
+					 {BATT_MEAS_PORT, BATT_MEAS_PIN}, {BATT_SYNC_PORT, BATT_SYNC_PIN}, \
+					 {TCXO_PORT, TCXO_PIN}}
+#endif
