@@ -98,6 +98,7 @@ RADIODIR      = ../../common/radio
 SENSORSDIR    = ../../common/sensors
 HALDIR        = ../../common/stm32/$(HALTYPE)
 HALINCDIR     = ../../common/stm32/includes
+BOARDDIR      = ../../common/stm32/$(HALTYPE)/boards
 LIBDIR        = $(MACDIR)/lib/gcc/$(HALTYPE)
 BUILDDIR      = build/$(BOARD)
 
@@ -154,7 +155,7 @@ endif
 # RULES
 
 SRCS = $(wildcard $(OSDIR)/*.c $(UTILSDIR)/*.c $(RADIODIR)/*.c $(SENSORSDIR)/*.c $(HALDIR)/*.c $(HALDIR)/*.s $(MACDIR)/*.c *.c)
-INC += -I$(MACDIR) -I$(PICOMACDIR) -I$(LORAMACDIR) -I$(OSDIR) -I$(UTILSDIR) -I$(RADIODIR) -I$(SENSORSDIR) -I$(HALDIR) -I$(HALINCDIR)
+INC += -I$(MACDIR) -I$(PICOMACDIR) -I$(LORAMACDIR) -I$(OSDIR) -I$(UTILSDIR) -I$(RADIODIR) -I$(SENSORSDIR) -I$(HALDIR) -I$(HALINCDIR) -I$(BOARDDIR)
 
 SRCS := $(filter-out $(UTILSDIR)/lora_certif.c, $(SRCS))
 
