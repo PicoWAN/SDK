@@ -518,8 +518,16 @@ static void system_clock_Config(void)
 	 */
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-	/* Disable Power Control clock */
-	__HAL_RCC_PWR_CLK_DISABLE();
+	/* Enable PVD */
+	HAL_PWR_EnablePVD();
+
+	/* Enables the Ultra Low Power mode */
+	HAL_PWREx_EnableUltraLowPower( );
+
+	__HAL_FLASH_SLEEP_POWERDOWN_ENABLE();
+
+	/*Enable fast wakeUp*/
+	HAL_PWREx_EnableFastWakeUp( );
 
 	/* Enable HSI+PLL and LSE Oscillators */
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_MSI;
