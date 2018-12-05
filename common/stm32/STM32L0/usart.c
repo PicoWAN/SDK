@@ -110,6 +110,7 @@ void usart_init(usart_port_t usart, uint32_t baudrate)
 		__HAL_RCC_USART5_CLK_ENABLE();
 	} else if (usart_ptr == LPUART1) {
 		__HAL_RCC_LPUART1_CLK_ENABLE();
+		__HAL_RCC_LPUART1_CLK_SLEEP_ENABLE();
 #if defined(CFG_CONSOLE_RX_ENABLED) && !defined(CFG_DISABLE_LOW_POWER_MODE)
 		/* The maximum allowed baudrate for LPUART1 is 9600 bps
 		 * when the LSE (32 kHz) is used as peripheral clock

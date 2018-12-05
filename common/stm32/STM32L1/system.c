@@ -724,6 +724,12 @@ void system_init(void)
 	/* Configure IOs and TIMER9 (tick counter) */
 	system_io_init();
 
+	RCC->APB2LPENR = 0; // disable APB2 peripheral clocks in Sleep mode
+	RCC->APB1LPENR = 0; // disable APB1 peripheral clocks in Sleep mode
+	RCC->AHBLPENR = 0; // disable AHB peripheral and GPIO clocks in Sleep mode
+
+	RCC->APB1LPENR |= RCC_APB2LPENR_TIM9LPEN; // enable TIM9 in Sleep mode
+
 	/* Configure MSI at 65KHz */
 	RCC->ICSCR = (RCC->ICSCR & ~RCC_ICSCR_MSIRANGE) | RCC_ICSCR_MSIRANGE_0;
 

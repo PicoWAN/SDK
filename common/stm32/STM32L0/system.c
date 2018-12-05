@@ -509,6 +509,13 @@ static void system_clock_Config(void)
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
+	RCC->IOPSMENR = 0; // disable GPIO clocks in Sleep mode
+	RCC->APB2SMENR = 0; // disable APB2 peripheral clocks in Sleep mode
+	RCC->APB1SMENR = 0; // disable APB1 peripheral clocks in Sleep mode
+	RCC->AHBSMENR = 0; // disable AHB peripheral clocks in Sleep mode
+
+	__HAL_RCC_LPTIM1_CLK_SLEEP_ENABLE(); // enable LPTIM1 in Sleep mode
+
 	/* Enable Power Control clock */
 	__HAL_RCC_PWR_CLK_ENABLE();
 
