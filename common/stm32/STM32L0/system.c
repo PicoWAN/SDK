@@ -644,7 +644,7 @@ void system_sleep_low_power(void)
 	while ((PWR->CSR & PWR_CSR_VOSF) != RESET);
 
 	/* Suspend execution until IRQ */
-	HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
 	/* Enable HSI Clock */
 	RCC->CR |= ((uint32_t) RCC_CR_HSION);
