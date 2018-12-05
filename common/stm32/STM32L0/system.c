@@ -35,6 +35,7 @@
 #include "boards.h"
 #include "stm32l0xx.h"
 #include "stm32l0xx_hal.h"
+#include "stm32l0xx_ll_pwr.h"
 
 /* Variables used to save GPIO configuration */
 static uint32_t GPIOA_MODER, GPIOB_MODER, GPIOC_MODER, GPIOD_MODER, GPIOE_MODER, GPIOH_MODER;
@@ -642,6 +643,8 @@ void system_sleep_low_power(void)
 
 	/* Wait Until the Voltage Regulator is ready */
 	while ((PWR->CSR & PWR_CSR_VOSF) != RESET);
+
+	LL_PWR_EnableUltraLowPower();
 
 	/* Suspend execution until IRQ */
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
