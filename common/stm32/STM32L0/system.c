@@ -601,24 +601,18 @@ static void prepare_clock(void)
 	/* Wait until MSI is ready */
 	while ((RCC->CR & RCC_CR_MSIRDY) == RESET);
 
-	/* Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and MCOPRE[2:0] bits */
-	RCC->CFGR &= (uint32_t) 0x88FF400C;
-	/* Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
-	RCC->CR &= (uint32_t) 0xFEF6FFF6;
-	/* Reset HSI48ON  bit */
-	RCC->CRRCR &= ~RCC_CRRCR_HSI48ON;
-	/* Reset HSEBYP bit */
-	RCC->CR &= ~RCC_CR_HSEBYP;
-	/* Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
-	RCC->CFGR &= (uint32_t) 0xFF02FFFF;
-	/* Disable all interrupts */
-	RCC->CIER = 0x00000000;
-
+	/* Disable MCO, switch Sysclk to MSI */
+	RCC->CFGR &= ~(RCC_CFGR_MCOSEL | RCC_CFGR_SW);
 	/* Wait until MSI is used as system clock source */
 	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (uint32_t) RCC_CFGR_SWS_MSI);
 
-	/* Disable LSI clock */
-	RCC->CSR &= (uint32_t) ((uint32_t) ~RCC_CSR_LSION);
+	/* Stop all clocks except LSE */
+	RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_PLLON | RCC_CR_HSEBYP);
+	RCC->CSR &= ~(RCC_CSR_LSION);
+	RCC->CRRCR &= ~(RCC_CRRCR_HSI48ON);
+
+	/* Disable all interrupts */
+	RCC->CIER = 0x00000000;
 
 	/* Switch Flash mode to no latency (WS 0) */
 	__HAL_FLASH_SET_LATENCY(FLASH_LATENCY_0);
