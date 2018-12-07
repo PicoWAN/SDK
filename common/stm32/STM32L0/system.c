@@ -36,6 +36,7 @@
 #include "stm32l0xx.h"
 #include "stm32l0xx_hal.h"
 #include "stm32l0xx_ll_pwr.h"
+#include "stm32l0xx_ll_rcc.h"
 
 /* Variables used to save GPIO configuration */
 static uint32_t GPIOA_MODER, GPIOB_MODER, GPIOC_MODER, GPIOD_MODER, GPIOE_MODER, GPIOH_MODER;
@@ -537,6 +538,9 @@ static void system_clock_Config(void)
 
 	/* Enable fast wakeUp */
 	HAL_PWREx_EnableFastWakeUp( );
+
+	/* Restart on HSI clock on stop mode exit */
+	LL_RCC_SetClkAfterWakeFromStop(LL_RCC_STOP_WAKEUPCLOCK_HSI);
 
 	/* Enable HSI+PLL and LSE Oscillators */
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_MSI;
