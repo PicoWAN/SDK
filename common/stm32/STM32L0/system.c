@@ -28,6 +28,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
+
 #include <os.h>
 #include <system.h>
 #include <gpio.h>
@@ -68,6 +70,7 @@ static os_job_t disable_dcdc_job;
 
 static uint8_t irqlevel = 0;
 
+static bool do_stop_mode = true;
 
 static void system_io_init(void)
 {
@@ -590,22 +593,8 @@ void system_sleep(void)
 	__WFI();
 }
 
-/* Low Power Sleep mode */
-void system_sleep_low_power(void)
+static void prepare_clock(void)
 {
-	/* Wait for any pending UART transmission to complete */
-	usart_sync(USART_PORT_1);
-	usart_sync(USART_PORT_2);
-	usart_sync(USART_PORT_4);
-	usart_sync(USART_PORT_5);
-	usart_sync(LPUART_PORT_1);
-
-	/* Set IO in lowpower configuration*/
-	save_gpio_config_for_lowpower();
-
-	/* Disable PVD */
-	HAL_PWR_DisablePVD();
-
 	/* Reset RCC (MSI as System Clock) */
 	/* Set MSION bit */
 	RCC->CR |= (uint32_t) RCC_CR_MSION;
@@ -642,18 +631,17 @@ void system_sleep_low_power(void)
 
 	/* Wait Until the Voltage Regulator is ready */
 	while ((PWR->CSR & PWR_CSR_VOSF) != RESET);
+}
 
-	/* Clear Wake Up flag */
-	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+static void reconfigure_clock(void)
+{
+	if ((RCC->CR & RCC_CR_HSIRDY) == RESET) {
+		/* Enable HSI Clock */
+		RCC->CR |= ((uint32_t) RCC_CR_HSION);
 
-	/* Suspend execution until IRQ */
-	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
-
-	/* Enable HSI Clock */
-	RCC->CR |= ((uint32_t) RCC_CR_HSION);
-
-	/* Wait until HSI is ready */
-	while ((RCC->CR & RCC_CR_HSIRDY) == RESET);
+		/* Wait until HSI is ready */
+		while ((RCC->CR & RCC_CR_HSIRDY) == RESET);
+	}
 
 	/* Enable Prefetch Buffer */
 	__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
@@ -683,9 +671,6 @@ void system_sleep_low_power(void)
 	/* Wait until PLL is used as system clock source */
 	while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != (uint32_t) RCC_CFGR_SWS_PLL);
 
-	// Disable MSI
-	RCC->CR &= ~((uint32_t) RCC_CR_MSION);
-
 	/* HCLK = SYSCLK/1 */
 	RCC->CFGR = (RCC->CFGR & (uint32_t) ((uint32_t) ~RCC_CFGR_HPRE)) | (uint32_t) RCC_CFGR_HPRE_DIV1;
 
@@ -694,6 +679,43 @@ void system_sleep_low_power(void)
 
 	/* PCLK1 = HCLK/1 */
 	RCC->CFGR = (RCC->CFGR & (uint32_t) ((uint32_t) ~RCC_CFGR_PPRE1)) | (uint32_t) RCC_CFGR_PPRE1_DIV1;
+
+	// Disable MSI
+	RCC->CR &= ~((uint32_t) RCC_CR_MSION);
+}
+
+/* Low Power Sleep mode */
+void system_sleep_low_power(void)
+{
+	/* Wait for any pending UART transmission to complete */
+	usart_sync(USART_PORT_1);
+	usart_sync(USART_PORT_2);
+	usart_sync(USART_PORT_4);
+	usart_sync(USART_PORT_5);
+	usart_sync(LPUART_PORT_1);
+
+	/* Set IO in lowpower configuration*/
+	save_gpio_config_for_lowpower();
+
+	/* Disable PVD */
+	HAL_PWR_DisablePVD();
+
+	// if lp sleep, reconfigure sysclk to msi at 65khz
+	// and stop remaining clocks. Otherwise, everything
+	// will be shutdown properly in stop mode.
+	if (!do_stop_mode)
+		prepare_clock();
+
+	/* Clear Wake Up flag */
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+	/* Suspend execution until IRQ */
+	if (do_stop_mode)
+		HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+	else
+		HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+
+	reconfigure_clock();
 
 	restore_gpio_config();
 
