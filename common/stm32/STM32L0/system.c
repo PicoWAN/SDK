@@ -529,12 +529,13 @@ static void system_clock_Config(void)
 	/* Enable PVD */
 	HAL_PWR_EnablePVD();
 
-	/* Enables the Ultra Low Power mode */
-	HAL_PWREx_EnableUltraLowPower( );
-
+	/* Allow flash powerdown when going LP sleep */
 	__HAL_FLASH_SLEEP_POWERDOWN_ENABLE();
 
-	/*Enable fast wakeUp*/
+	/* Enables the Ultra Low Power mode */
+	HAL_PWREx_EnableUltraLowPower();
+
+	/* Enable fast wakeUp */
 	HAL_PWREx_EnableFastWakeUp( );
 
 	/* Enable HSI+PLL and LSE Oscillators */
@@ -598,28 +599,23 @@ void system_sleep_low_power(void)
 	/* Set IO in lowpower configuration*/
 	save_gpio_config_for_lowpower();
 
-	/* Disable Fast WakeUp (up to 3ms wake up time) */
-	// HAL_PWREx_DisableFastWakeUp();
-
 	/* Disable PVD */
 	HAL_PWR_DisablePVD();
-
-	/* Enable Ultra low power mode (up to 3ms wake up time) */
-	// HAL_PWREx_EnableUltraLowPower();
 
 	/* Reset RCC (MSI as System Clock) */
 	/* Set MSION bit */
 	RCC->CR |= (uint32_t) RCC_CR_MSION;
 	/* Wait until MSI is ready */
 	while ((RCC->CR & RCC_CR_MSIRDY) == RESET);
+
 	/* Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and MCOPRE[2:0] bits */
 	RCC->CFGR &= (uint32_t) 0x88FF400C;
 	/* Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
 	RCC->CR &= (uint32_t) 0xFEF6FFF6;
 	/* Reset HSI48ON  bit */
-	RCC->CRRCR &= (uint32_t) 0xFFFFFFFE;
+	RCC->CRRCR &= ~RCC_CRRCR_HSI48ON;
 	/* Reset HSEBYP bit */
-	RCC->CR &= (uint32_t) 0xFFFBFFFF;
+	RCC->CR &= ~RCC_CR_HSEBYP;
 	/* Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
 	RCC->CFGR &= (uint32_t) 0xFF02FFFF;
 	/* Disable all interrupts */
@@ -637,16 +633,14 @@ void system_sleep_low_power(void)
 	/* Disable Prefetch Buffer */
 	__HAL_FLASH_PREFETCH_BUFFER_DISABLE();
 
-	/* Disable FLASH during Sleep */
-	__HAL_FLASH_SLEEP_POWERDOWN_ENABLE();
-
 	/* Select the Voltage Range 3 (1.2V) */
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
 	/* Wait Until the Voltage Regulator is ready */
 	while ((PWR->CSR & PWR_CSR_VOSF) != RESET);
 
-	LL_PWR_EnableUltraLowPower();
+	/* Clear Wake Up flag */
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
 	/* Suspend execution until IRQ */
 	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
@@ -697,16 +691,7 @@ void system_sleep_low_power(void)
 	/* PCLK1 = HCLK/1 */
 	RCC->CFGR = (RCC->CFGR & (uint32_t) ((uint32_t) ~RCC_CFGR_PPRE1)) | (uint32_t) RCC_CFGR_PPRE1_DIV1;
 
-	/* Disable Ultra low power mode */
-	// HAL_PWREx_DisableUltraLowPower();
-
-	/* Enable FLASH during Sleep */
-	__HAL_FLASH_SLEEP_POWERDOWN_DISABLE();
-
 	restore_gpio_config();
-
-	/* Clear Wake Up flag */
-	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
 	/* Enable PVD */
 	HAL_PWR_EnablePVD();
