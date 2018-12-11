@@ -31,8 +31,11 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
+#include <stdbool.h>
 #include <stdint.h>
-#include <arch.h>
+
+#include "os.h"
+#include "arch.h"
 #include "gpio.h"
 
 #define PIN_END				255
@@ -143,6 +146,7 @@ void system_reboot(void);
  */
 void system_init(void);
 
+void system_enable_stop_mode(bool enable_stop);
 os_time_t system_get_mininal_lp_sleep(void);
 os_time_t system_get_wakeup_latency(void);
 

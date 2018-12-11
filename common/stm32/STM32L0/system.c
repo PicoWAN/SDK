@@ -675,6 +675,11 @@ static void reconfigure_clock(void)
 	RCC->CR &= ~((uint32_t) RCC_CR_MSION);
 }
 
+void system_enable_stop_mode(bool enable_stop)
+{
+	do_stop_mode = enable_stop;
+}
+
 os_time_t system_get_mininal_lp_sleep(void)
 {
 	// return chip "go to sleep" configuration time + chip total wakup time.
