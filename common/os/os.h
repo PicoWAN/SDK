@@ -46,13 +46,13 @@ typedef int64_t os_time_t;
 #error "TICK_FREQ too low (should be >= 8192) !"
 #endif
 
-#define s2ostime(s)		((os_time_t) ((int64_t) s * TICK_FREQ))
-#define ms2ostime(ms)		((os_time_t) (((int64_t) ms * TICK_FREQ) / 1000))
-#define us2ostime(us)		((os_time_t) (((int64_t) us * (TICK_FREQ / 64)) / 15625))
+#define s2ostime(s)		((os_time_t) ((int64_t) (s) * TICK_FREQ))
+#define ms2ostime(ms)		((os_time_t) (((int64_t) (ms) * TICK_FREQ) / 1000))
+#define us2ostime(us)		((os_time_t) (((int64_t) (us) * (TICK_FREQ / 64)) / 15625))
 
-#define ostime2s(t)		((int64_t) (t / TICK_FREQ))
-#define ostime2ms(t)		((int64_t) ((t * (int64_t) 1000) / TICK_FREQ))
-#define ostime2us(t)		((int64_t) ((t * (int64_t) 15625) / (TICK_FREQ / 64)))
+#define ostime2s(t)		((int64_t) ((t) / TICK_FREQ))
+#define ostime2ms(t)		((int64_t) (((t) * (int64_t) 1000) / TICK_FREQ))
+#define ostime2us(t)		((int64_t) (((t) * (int64_t) 15625) / (TICK_FREQ / 64)))
 
 struct os_job {
 	void (*callback)(struct os_job *);
