@@ -675,6 +675,25 @@ static void reconfigure_clock(void)
 	RCC->CR &= ~((uint32_t) RCC_CR_MSION);
 }
 
+os_time_t system_get_mininal_lp_sleep(void)
+{
+	// return chip "go to sleep" configuration time + chip total wakup time.
+	if (do_stop_mode)
+		return us2ostime(244) + system_get_wakeup_latency();
+	else
+		return us2ostime(2218) + system_get_wakeup_latency();
+}
+
+os_time_t system_get_wakeup_latency(void)
+{
+	// first value is time needed for reconfiguration of chip
+	// second value is lag between timer tick cmp and code actually running.
+	if (do_stop_mode)
+		return us2ostime(244 + 122);
+	else
+		return us2ostime(2440 + 488);
+}
+
 /* Low Power Sleep mode */
 void system_sleep_low_power(void)
 {

@@ -143,4 +143,7 @@ void system_reboot(void);
  */
 void system_init(void);
 
+os_time_t system_get_mininal_lp_sleep(void);
+os_time_t system_get_wakeup_latency(void);
+
 #endif /* _SYSTEM_H_ */
