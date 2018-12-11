@@ -530,9 +530,6 @@ static void system_clock_Config(void)
 	 */
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-	/* Enable PVD */
-	HAL_PWR_EnablePVD();
-
 	/* Allow flash powerdown when going LP sleep */
 	__HAL_FLASH_SLEEP_POWERDOWN_ENABLE();
 
@@ -691,9 +688,6 @@ void system_sleep_low_power(void)
 	/* Set IO in lowpower configuration*/
 	save_gpio_config_for_lowpower();
 
-	/* Disable PVD */
-	HAL_PWR_DisablePVD();
-
 	// if lp sleep, reconfigure sysclk to msi at 65khz
 	// and stop remaining clocks. Otherwise, everything
 	// will be shutdown properly in stop mode.
@@ -713,8 +707,6 @@ void system_sleep_low_power(void)
 
 	restore_gpio_config();
 
-	/* Enable PVD */
-	HAL_PWR_EnablePVD();
 }
 
 void system_reboot(void)
