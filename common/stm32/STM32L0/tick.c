@@ -121,7 +121,7 @@ latency_t tick_handle_next_wakeup(uint64_t time, uint8_t lp_blocked)
 		/* The deadline is almost now (no time sleep), disable the comparator and its interrupt */
 		__HAL_LPTIM_DISABLE_IT(&hlptim, LPTIM_IT_CMPM);
 		return NO_LATENCY;
-	} else if (delta < (HAL_CPU_LP_SLEEP_LATENCY + HAL_CPU_LP_WAKEUP_LATENCY) || lp_blocked) {
+	} else if (delta < system_get_mininal_lp_sleep() || lp_blocked) {
 		if (delta + cnt <= 0xFFFF) {
 			/* The deadline is soon enough, configure the comparator to its exact time */
 			__HAL_LPTIM_COMPARE_SET(&hlptim, (uint16_t) (delta + cnt));
@@ -131,9 +131,9 @@ latency_t tick_handle_next_wakeup(uint64_t time, uint8_t lp_blocked)
 
 		/* Notify the scheduler that we have no time to go to low power sleep mode */
 		return LOW_LATENCY;
-	} else if ((delta + cnt - HAL_CPU_LP_WAKEUP_LATENCY) <= 0xFFFF) {
+	} else if ((delta + cnt - system_get_wakeup_latency()) <= 0xFFFF) {
 		/* The deadline is soon enough, configure the comparator in order compensate the CPU wakeup latency */
-		__HAL_LPTIM_COMPARE_SET(&hlptim, (uint16_t) (delta + cnt - HAL_CPU_LP_WAKEUP_LATENCY));
+		__HAL_LPTIM_COMPARE_SET(&hlptim, (uint16_t) (delta + cnt - system_get_wakeup_latency()));
 		/* Enable comparator interrupt */
 		__HAL_LPTIM_ENABLE_IT(&hlptim, LPTIM_IT_CMPM);
 	}
