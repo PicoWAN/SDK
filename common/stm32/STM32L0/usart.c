@@ -129,6 +129,10 @@ void usart_init(usart_port_t usart, uint32_t baudrate)
 	huart.Init.Mode	      = USART_MODE_TX;
 
 	HAL_UART_Init(&huart);
+
+	/* Configuring the LPUART specific LP feature - the wakeup from STOP */
+	HAL_UARTEx_EnableClockStopMode(&huart);
+	HAL_UARTEx_EnableStopMode( &huart );
 }
 
 void usart_deinit(usart_port_t usart)
