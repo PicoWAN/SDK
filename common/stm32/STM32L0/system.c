@@ -699,6 +699,11 @@ os_time_t system_get_wakeup_latency(void)
 		return us2ostime(2440 + 488);
 }
 
+void __attribute__((weak)) __sleep_init(void) {};
+void __attribute__((weak)) __sleep_enter_wfi(void) {};
+void __attribute__((weak)) __sleep_exit_wfi(void) {};
+void __attribute__((weak)) __sleep_end(void) {};
+
 /* Low Power Sleep mode */
 void system_sleep_low_power(void)
 {
@@ -708,6 +713,8 @@ void system_sleep_low_power(void)
 	usart_sync(USART_PORT_4);
 	usart_sync(USART_PORT_5);
 	usart_sync(LPUART_PORT_1);
+
+	__sleep_init();
 
 	/* Set IO in lowpower configuration*/
 	save_gpio_config_for_lowpower();
@@ -721,16 +728,21 @@ void system_sleep_low_power(void)
 	/* Clear Wake Up flag */
 	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
+	__sleep_enter_wfi();
+
 	/* Suspend execution until IRQ */
 	if (do_stop_mode)
 		HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 	else
 		HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 
+	__sleep_exit_wfi();
+
 	reconfigure_clock();
 
 	restore_gpio_config();
 
+	__sleep_end();
 }
 
 void system_reboot(void)
