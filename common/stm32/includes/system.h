@@ -135,6 +135,30 @@ void system_sleep(void);
 void system_sleep_low_power(void);
 
 /*!
+ * \brief	Allow system to enter stop mode as "low power" sleep.
+ *
+ * \note    Stop mode allows to enter even lower power levels while waiting for a task or event, but with some
+ *			severe limitations regarding chip functions while sleeping.
+ *
+ * \param   enable_stop True to enable stop mode, False to disable.
+ */
+void system_enable_stop_mode(bool enable_stop);
+
+/*!
+ * \brief   Get minimal low power sleep time.
+ *
+ * \note    Return minimal nap time taking in account current sleep mode setup and wakeup latency.
+ */
+os_time_t system_get_mininal_lp_sleep(void);
+
+/*!
+ * \brief   Get low power sleep wakeup latency time.
+ *
+ * \note    Return current sleep mode wakeup latency, to be taken in account by the scheduler.
+ */
+os_time_t system_get_wakeup_latency(void);
+
+/*!
  * \brief   Reboots the system.
  */
 void system_reboot(void);
@@ -146,8 +170,5 @@ void system_reboot(void);
  */
 void system_init(void);
 
-void system_enable_stop_mode(bool enable_stop);
-os_time_t system_get_mininal_lp_sleep(void);
-os_time_t system_get_wakeup_latency(void);
 
 #endif /* _SYSTEM_H_ */
