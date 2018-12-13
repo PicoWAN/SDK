@@ -34,10 +34,6 @@
 /* Tick system is LSE/4 = 8,192 kHz */
 #define TICK_FREQ          8192 // Hz
 
-/* CPU Low-Power wakeup and sleep latency */
-#define HAL_CPU_LP_WAKEUP_LATENCY	24 // in ticks (~3 ms)
-#define HAL_CPU_LP_SLEEP_LATENCY	24 // in ticks (~3 ms)
-
 /* GPIO mapping */
 typedef enum {
 	GPIO_PORT_A = 0,
