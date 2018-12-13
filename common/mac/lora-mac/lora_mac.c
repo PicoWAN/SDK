@@ -1960,7 +1960,7 @@ static void on_rx_window1_timer_event(osal_job_t *j)
 		open_receive_window = 1; // Allow to open RX1 because RX2 is open before in class C
 	}
 
-	rxtime = timestamp_tx_done + ms2us(rx_windows1_delay) + osal_get_additional_cpu_wakeup_latency() + MARGIN_TIME + RADIO_CONFIG_TIME;
+	rxtime = timestamp_tx_done + ms2us(rx_windows1_delay) + CPU_WAKEUP_TIME + MARGIN_TIME + RADIO_CONFIG_TIME;
 
 	datarate = loramac_params.channels_datarate - loramac_params.rx1_dr_offset;
 
@@ -1987,7 +1987,7 @@ static void on_rx_window2_timer_event(osal_job_t *j)
 
 	rx_slot = 1;
 
-	rxtime = timestamp_tx_done + ms2us(rx_windows2_delay) + osal_get_additional_cpu_wakeup_latency() + MARGIN_TIME + RADIO_CONFIG_TIME;
+	rxtime = timestamp_tx_done + ms2us(rx_windows2_delay) + CPU_WAKEUP_TIME + MARGIN_TIME + RADIO_CONFIG_TIME;
 
 	// For higher datarates, we increase the number of symbols generating a Rx Timeout
 	if (loramac_params.rx2_channel.datarate == DR_6) {
@@ -3109,9 +3109,9 @@ static mac_status_t loramac_init_activation_on_air(uint8_t *dev_eui, uint8_t *ap
 	reset_mac_parameters();
 
 	rx_windows1_delay = loramac_params.join_accept_delay_1 - us2ms_round(osal_get_radio_wakeup_latency()) -
-			    us2ms_round(osal_get_additional_cpu_wakeup_latency()) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
+			    us2ms_round(CPU_WAKEUP_TIME) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
 	rx_windows2_delay = loramac_params.join_accept_delay_2 - us2ms_round(osal_get_radio_wakeup_latency()) -
-			    us2ms_round(osal_get_additional_cpu_wakeup_latency()) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
+			    us2ms_round(CPU_WAKEUP_TIME) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
 
 	osal_printf("message len %d, ", message_tx_rx.msg_len);
 	for (i = 0; i < message_tx_rx.msg_len; i++) {
@@ -3206,9 +3206,9 @@ static mac_status_t _send_when_possible(uint8_t type, uint8_t port, const uint8_
 	mac_commands_buffer_index = 0;
 
 	rx_windows1_delay = loramac_params.receive_delay_1 - us2ms_round(osal_get_radio_wakeup_latency()) -
-			    us2ms_round(osal_get_additional_cpu_wakeup_latency()) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
+			    us2ms_round(CPU_WAKEUP_TIME) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
 	rx_windows2_delay = loramac_params.receive_delay_2 - us2ms_round(osal_get_radio_wakeup_latency()) -
-			    us2ms_round(osal_get_additional_cpu_wakeup_latency()) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
+			    us2ms_round(CPU_WAKEUP_TIME) - us2ms_round(MARGIN_TIME) - us2ms_round(RADIO_CONFIG_TIME);
 
 	schedule_state = schedule_tx();
 	if (schedule_state == LORAMAC_STATUS_DEVICE_OFF) {
