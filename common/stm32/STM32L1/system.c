@@ -717,6 +717,22 @@ void system_reboot(void)
 	NVIC_SystemReset();
 }
 
+
+void system_enable_stop_mode(bool enable_stop)
+{
+	(void)enable_stop;
+}
+
+os_time_t system_get_mininal_lp_sleep(void)
+{
+	return 0;
+}
+
+os_time_t system_get_wakeup_latency(void)
+{
+	return 0;
+}
+
 void system_init(void)
 {
 	system_disable_irqs();
