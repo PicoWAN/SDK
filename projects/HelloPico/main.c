@@ -43,7 +43,7 @@
 #include <spi.h>
 #include <stdint.h>
 #include <usart.h>
-#ifdef HAS_LIS2DE12_ACCELEROMETER
+#ifdef HAS_LIS2_ACCELEROMETER
 #include <accelerometer.h>
 #include <lis2de12.h>
 #endif
@@ -322,7 +322,7 @@ void button_handler(uint8_t num, enum button_press_duration duration)
 	}
 }
 
-#ifdef HAS_LIS2DE12_ACCELEROMETER
+#ifdef HAS_LIS2_ACCELEROMETER
 void accelerometer_handler(uint8_t num)
 {
 	if (num == ACC1_INT) {
@@ -336,7 +336,7 @@ void accelerometer_handler(uint8_t num)
 
 static void start_usecase_cb(os_job_t* j)
 {
-#ifdef HAS_LIS2DE12_ACCELEROMETER
+#ifdef HAS_LIS2_ACCELEROMETER
 	/* Initialize the accelerometer */
 	i2c_power_up(ACC_I2C_PORT);
 	lis2de12_init(ACC_I2C_PORT);
@@ -351,7 +351,7 @@ static void stop_usecase_cb(os_job_t* j)
 {
 	is_usecase_started = 0;
 
-#ifdef HAS_LIS2DE12_ACCELEROMETER
+#ifdef HAS_LIS2_ACCELEROMETER
 	/* Disable the accelerometer */
 	accelerometer_init(NULL);
 

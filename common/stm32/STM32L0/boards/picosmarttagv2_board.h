@@ -10,7 +10,7 @@
 
 #define HAS_TCXO
 
-#define HAS_LIS2DE12_ACCELEROMETER
+#define HAS_LIS2_ACCELEROMETER
 
 // RF characteristics
 #define MAX_RF_POWER			20 // dBm

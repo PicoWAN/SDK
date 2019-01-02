@@ -4,7 +4,7 @@
  *
  *************************************************************************************/
 
-#define HAS_LIS2DE12_ACCELEROMETER
+#define HAS_LIS2_ACCELEROMETER
 #define HAS_TCXO
 
 // RF characteristics
