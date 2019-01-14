@@ -234,6 +234,21 @@ To properly run the PicoWAN and LoRaWAN stacks, the following hardware requireme
 
 ## History
 
+v2.1.0:
+* Reduce power consumption
+* Add stop mode
+* Boards
+    * Move boards configuration into separated files
+    * Add PicoSmartTag v2 board
+    * Add Picoshield v2 board
+* LoRaMAC
+    * Bugfix
+* ATModem
+    * Bugfix
+    * Better debug
+    * Add parameter for the send function
+    * Remove the possibility of querying the keys
+
 v2.0.1:
 * Add missing udev rules file for PicoFlash
 * Fix wrong include paths in IAR and TrueSTUDIO projects
